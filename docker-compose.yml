@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    volumes:
+      - routeforge-data:/app/data
+    environment:
+      - APISIX_ADMIN_URL=http://host.docker.internal:9180
+      - APISIX_API_KEY=edd1c9f034335f136f87ad84b625c8f1
+      - DB_PATH=/app/data/routeforge.db
+    expose:
+      - "8080"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  routeforge-data:

@@ -1,0 +1,32 @@
+# === Backend (Java / Maven) ===
+backend/target/
+backend/data/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/*.iml
+
+# === Frontend (Node / Vite) ===
+frontend/node_modules/
+frontend/dist/
+frontend/*.local
+
+# === IDE ===
+.idea/
+.vscode/
+*.iml
+*.swp
+*~
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Environment / Secrets ===
+.env
+.env.*
+!.env.example
+
+# === Logs ===
+*.log
+
+# === Docker ===
+docker-compose.override.yml
