@@ -11,7 +11,7 @@ export interface ApisixInstance {
   id: number
   name: string
   adminUrl: string
-  apiKey: string
+  apiKeySet: boolean
   default: boolean
   createdAt?: string
 }

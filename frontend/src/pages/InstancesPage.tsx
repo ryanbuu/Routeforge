@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Plus, Pencil, Trash2, Star } from 'lucide-react'
+import { Plus, Pencil, Trash2, Star, KeyRound } from 'lucide-react'
 
 interface FormState {
   name: string
@@ -48,6 +48,8 @@ export function InstancesPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
 
+  const isCreating = editId === null
+
   const openCreate = () => {
     setEditId(null)
     setForm(emptyForm)
@@ -59,7 +61,7 @@ export function InstancesPage() {
     setForm({
       name: inst.name,
       adminUrl: inst.adminUrl,
-      apiKey: inst.apiKey,
+      apiKey: '',
       isDefault: inst.default,
     })
     setDialogOpen(true)
@@ -68,16 +70,19 @@ export function InstancesPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      const payload = {
+      const payload: Record<string, unknown> = {
         name: form.name,
         adminUrl: form.adminUrl,
-        apiKey: form.apiKey,
         default: form.isDefault,
       }
+      // Only send apiKey if provided (create: required, edit: optional)
+      if (form.apiKey) {
+        payload.apiKey = form.apiKey
+      }
       if (editId) {
-        await instancesApi.update(editId, payload)
+        await instancesApi.update(editId, payload as any)
       } else {
-        await instancesApi.create(payload)
+        await instancesApi.create(payload as any)
       }
       queryClient.invalidateQueries({ queryKey: ['instances'] })
       await refresh()
@@ -86,6 +91,8 @@ export function InstancesPage() {
       setSaving(false)
     }
   }
+
+  const canSave = form.name && form.adminUrl && (editId !== null || form.apiKey)
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -134,8 +141,15 @@ export function InstancesPage() {
                     <TableCell className="text-muted-foreground">{idx + 1}</TableCell>
                     <TableCell className="font-medium">{inst.name}</TableCell>
                     <TableCell className="text-sm text-muted-foreground font-mono">{inst.adminUrl}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground font-mono">
-                      {inst.apiKey.slice(0, 8)}...
+                    <TableCell>
+                      {inst.apiKeySet ? (
+                        <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <KeyRound className="h-3.5 w-3.5" />
+                          <span className="font-mono">••••••••</span>
+                        </span>
+                      ) : (
+                        <Badge variant="destructive">未设置</Badge>
+                      )}
                     </TableCell>
                     <TableCell>
                       {inst.default ? (
@@ -181,7 +195,7 @@ export function InstancesPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editId ? '编辑实例' : '添加实例'}</DialogTitle>
+            <DialogTitle>{isCreating ? '添加实例' : '编辑实例'}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
@@ -201,11 +215,18 @@ export function InstancesPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>API Key</Label>
+              <Label>
+                API Key
+                {!isCreating && (
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">留空则不修改</span>
+                )}
+              </Label>
               <Input
+                type="password"
                 value={form.apiKey}
                 onChange={e => setForm(f => ({ ...f, apiKey: e.target.value }))}
-                placeholder="edd1c9f034335f136f87ad84b625c8f1"
+                placeholder={isCreating ? 'edd1c9f034335f136f87ad84b625c8f1' : '••••••••'}
+                autoComplete="off"
               />
             </div>
             <label className="flex items-center gap-2 text-sm">
@@ -220,7 +241,7 @@ export function InstancesPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>取消</Button>
-            <Button onClick={handleSave} disabled={saving || !form.name || !form.adminUrl || !form.apiKey}>
+            <Button onClick={handleSave} disabled={saving || !canSave}>
               {saving ? '保存中...' : '保存'}
             </Button>
           </DialogFooter>

@@ -59,7 +59,10 @@ public class ApisixInstanceService {
         ApisixInstance existing = getById(id);
         existing.setName(updated.getName());
         existing.setAdminUrl(updated.getAdminUrl());
-        existing.setApiKey(updated.getApiKey());
+        // Only overwrite apiKey if a new value is provided
+        if (updated.getApiKey() != null && !updated.getApiKey().isBlank()) {
+            existing.setApiKey(updated.getApiKey());
+        }
         if (updated.isDefault()) {
             clearDefault();
         }
