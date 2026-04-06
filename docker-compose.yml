@@ -8,6 +8,8 @@ services:
       - APISIX_ADMIN_URL=http://host.docker.internal:9180
       - APISIX_API_KEY=edd1c9f034335f136f87ad84b625c8f1
       - DB_PATH=/app/data/routeforge.db
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=routeforge
     expose:
       - "8080"
 

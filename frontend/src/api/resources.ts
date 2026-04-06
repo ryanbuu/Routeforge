@@ -1,5 +1,30 @@
 import { apiClient } from './client'
 
+export const authApi = {
+  login: (username: string, password: string) =>
+    apiClient.post('/auth/login', { username, password }).then(r => r.data),
+  logout: () => apiClient.post('/auth/logout').then(r => r.data),
+  me: () => apiClient.get('/auth/me').then(r => r.data),
+}
+
+export interface ApisixInstance {
+  id: number
+  name: string
+  adminUrl: string
+  apiKey: string
+  default: boolean
+  createdAt?: string
+}
+
+export const instancesApi = {
+  list: () => apiClient.get('/instances').then(r => r.data) as Promise<ApisixInstance[]>,
+  get: (id: number) => apiClient.get(`/instances/${id}`).then(r => r.data) as Promise<ApisixInstance>,
+  create: (body: Partial<ApisixInstance>) => apiClient.post('/instances', body).then(r => r.data),
+  update: (id: number, body: Partial<ApisixInstance>) => apiClient.put(`/instances/${id}`, body).then(r => r.data),
+  remove: (id: number) => apiClient.delete(`/instances/${id}`),
+  setDefault: (id: number) => apiClient.put(`/instances/${id}/default`),
+}
+
 export const routesApi = {
   list: (page?: number, size = 10) =>
     apiClient.get('/routes', { params: page != null ? { page, size } : undefined }).then(r => r.data),

@@ -25,6 +25,8 @@ A modern dashboard for [Apache APISIX](https://apisix.apache.org/) built with Re
 - Operation audit log with filtering and pagination
 - Backend-powered pagination for routes and services
 - APISIX health check monitoring
+- Single-admin authentication (session-based)
+- Multi-tenancy: manage and switch between multiple APISIX instances
 
 ## Prerequisites
 
@@ -47,9 +49,11 @@ Set environment variables or edit `backend/src/main/resources/application.yml`:
 
 | Variable | Default | Description |
 |---|---|---|
-| `APISIX_ADMIN_URL` | `http://127.0.0.1:9180` | APISIX Admin API base URL |
+| `APISIX_ADMIN_URL` | `http://127.0.0.1:9180` | APISIX Admin API base URL (used to seed the default instance) |
 | `APISIX_API_KEY` | `edd1c9f034335f136f87ad84b625c8f1` | APISIX Admin API key |
 | `DB_PATH` | `./data/routeforge.db` | SQLite database file path |
+| `ADMIN_USERNAME` | `admin` | Dashboard login username |
+| `ADMIN_PASSWORD` | `routeforge` | Dashboard login password |
 
 ### 3. Start the backend
 
@@ -91,6 +95,8 @@ environment:
   - APISIX_ADMIN_URL=http://host.docker.internal:9180  # your APISIX Admin API
   - APISIX_API_KEY=edd1c9f034335f136f87ad84b625c8f1     # your API key
   - DB_PATH=/app/data/routeforge.db
+  - ADMIN_USERNAME=admin                                # dashboard login
+  - ADMIN_PASSWORD=routeforge                           # dashboard password
 ```
 
 > If APISIX runs on the host machine, `host.docker.internal` works on Docker Desktop (macOS/Windows). On Linux, use `--add-host=host.docker.internal:host-gateway` or the actual host IP.

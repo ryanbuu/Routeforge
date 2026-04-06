@@ -14,23 +14,27 @@ public class ConsumerController {
     }
 
     @GetMapping
-    public ResponseEntity<String> list() {
-        return ResponseEntity.ok(proxy.get("/apisix/admin/consumers"));
+    public ResponseEntity<String> list(
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        return ResponseEntity.ok(proxy.get("/apisix/admin/consumers", instanceId));
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<String> get(@PathVariable String username) {
-        return ResponseEntity.ok(proxy.get("/apisix/admin/consumers/" + username));
+    public ResponseEntity<String> get(@PathVariable String username,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        return ResponseEntity.ok(proxy.get("/apisix/admin/consumers/" + username, instanceId));
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<String> put(@PathVariable String username, @RequestBody String body) {
-        return ResponseEntity.ok(proxy.put("/apisix/admin/consumers/" + username, "consumer", username, body));
+    public ResponseEntity<String> put(@PathVariable String username, @RequestBody String body,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        return ResponseEntity.ok(proxy.put("/apisix/admin/consumers/" + username, "consumer", username, body, instanceId));
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<Void> delete(@PathVariable String username) {
-        proxy.delete("/apisix/admin/consumers/" + username, "consumer", username);
+    public ResponseEntity<Void> delete(@PathVariable String username,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        proxy.delete("/apisix/admin/consumers/" + username, "consumer", username, instanceId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -19,8 +19,9 @@ public class RouteController {
     @GetMapping
     public ResponseEntity<String> list(
             @RequestParam(required = false) Integer page,
-            @RequestParam(defaultValue = "10") int size) {
-        String raw = proxy.get("/apisix/admin/routes");
+            @RequestParam(defaultValue = "10") int size,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        String raw = proxy.get("/apisix/admin/routes", instanceId);
         if (page != null) {
             return ResponseEntity.ok(paginationService.paginate(raw, page, size));
         }
@@ -28,23 +29,27 @@ public class RouteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> get(@PathVariable String id) {
-        return ResponseEntity.ok(proxy.get("/apisix/admin/routes/" + id));
+    public ResponseEntity<String> get(@PathVariable String id,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        return ResponseEntity.ok(proxy.get("/apisix/admin/routes/" + id, instanceId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> put(@PathVariable String id, @RequestBody String body) {
-        return ResponseEntity.ok(proxy.put("/apisix/admin/routes/" + id, "route", id, body));
+    public ResponseEntity<String> put(@PathVariable String id, @RequestBody String body,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        return ResponseEntity.ok(proxy.put("/apisix/admin/routes/" + id, "route", id, body, instanceId));
     }
 
     @PostMapping
-    public ResponseEntity<String> post(@RequestBody String body) {
-        return ResponseEntity.ok(proxy.post("/apisix/admin/routes", "route", body));
+    public ResponseEntity<String> post(@RequestBody String body,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        return ResponseEntity.ok(proxy.post("/apisix/admin/routes", "route", body, instanceId));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        proxy.delete("/apisix/admin/routes/" + id, "route", id);
+    public ResponseEntity<Void> delete(@PathVariable String id,
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
+        proxy.delete("/apisix/admin/routes/" + id, "route", id, instanceId);
         return ResponseEntity.noContent().build();
     }
 }

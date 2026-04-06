@@ -1,5 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
+import { InstanceProvider } from '@/contexts/InstanceContext'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { LoginPage } from '@/pages/LoginPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { RoutesPage } from '@/pages/RoutesPage'
 import { UpstreamsPage } from '@/pages/UpstreamsPage'
@@ -8,20 +11,38 @@ import { ConsumersPage } from '@/pages/ConsumersPage'
 import { PluginsPage } from '@/pages/PluginsPage'
 import { SslPage } from '@/pages/SslPage'
 import { AuditPage } from '@/pages/AuditPage'
+import { InstancesPage } from '@/pages/InstancesPage'
 
 export default function App() {
+  const { username, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="h-8 w-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+      </div>
+    )
+  }
+
+  if (!username) {
+    return <LoginPage />
+  }
+
   return (
-    <Routes>
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/routes" element={<RoutesPage />} />
-        <Route path="/upstreams" element={<UpstreamsPage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/consumers" element={<ConsumersPage />} />
-        <Route path="/plugins" element={<PluginsPage />} />
-        <Route path="/ssl" element={<SslPage />} />
-        <Route path="/audit" element={<AuditPage />} />
-      </Route>
-    </Routes>
+    <InstanceProvider>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/routes" element={<RoutesPage />} />
+          <Route path="/upstreams" element={<UpstreamsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/consumers" element={<ConsumersPage />} />
+          <Route path="/plugins" element={<PluginsPage />} />
+          <Route path="/ssl" element={<SslPage />} />
+          <Route path="/audit" element={<AuditPage />} />
+          <Route path="/instances" element={<InstancesPage />} />
+        </Route>
+      </Routes>
+    </InstanceProvider>
   )
 }

@@ -2,9 +2,7 @@ package dev.ryanbuu.routeforge.controller;
 
 import dev.ryanbuu.routeforge.service.ApisixProxyService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/health")
@@ -16,9 +14,10 @@ public class HealthController {
     }
 
     @GetMapping
-    public ResponseEntity<String> health() {
+    public ResponseEntity<String> health(
+            @RequestHeader(value = "X-Apisix-Instance-Id", required = false) Long instanceId) {
         try {
-            String result = proxy.get("/apisix/admin/routes?page_size=1");
+            String result = proxy.get("/apisix/admin/routes?page_size=1", instanceId);
             return ResponseEntity.ok("{\"status\":\"up\",\"apisix\":\"connected\"}");
         } catch (Exception e) {
             return ResponseEntity.ok("{\"status\":\"up\",\"apisix\":\"disconnected\",\"error\":\"" + e.getMessage() + "\"}");

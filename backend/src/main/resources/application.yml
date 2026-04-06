@@ -5,6 +5,11 @@ apisix:
   admin-url: ${APISIX_ADMIN_URL:http://127.0.0.1:9180}
   api-key: ${APISIX_API_KEY:edd1c9f034335f136f87ad84b625c8f1}
 
+routeforge:
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:routeforge}
+
 spring:
   datasource:
     url: jdbc:sqlite:${DB_PATH:./data/routeforge.db}

@@ -1,33 +1,37 @@
 package dev.ryanbuu.routeforge.service;
 
-import dev.ryanbuu.routeforge.config.ApisixProperties;
-import org.springframework.http.HttpMethod;
+import dev.ryanbuu.routeforge.model.entity.ApisixInstance;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Set;
-
 @Service
 public class ApisixProxyService {
-    private static final Set<String> WRITE_METHODS = Set.of("POST", "PUT", "PATCH", "DELETE");
 
     private final WebClient webClient;
-    private final ApisixProperties props;
+    private final ApisixInstanceService instanceService;
     private final AuditLogService auditLogService;
 
-    public ApisixProxyService(WebClient webClient, ApisixProperties props, AuditLogService auditLogService) {
+    public ApisixProxyService(WebClient webClient, ApisixInstanceService instanceService, AuditLogService auditLogService) {
         this.webClient = webClient;
-        this.props = props;
+        this.instanceService = instanceService;
         this.auditLogService = auditLogService;
     }
 
-    public String get(String path) {
+    private ApisixInstance resolveInstance(Long instanceId) {
+        if (instanceId != null) {
+            return instanceService.getById(instanceId);
+        }
+        return instanceService.getDefault();
+    }
+
+    public String get(String path, Long instanceId) {
+        ApisixInstance inst = resolveInstance(instanceId);
         return webClient.get()
-                .uri(props.getAdminUrl() + path)
-                .header("X-API-KEY", props.getApiKey())
+                .uri(inst.getAdminUrl() + path)
+                .header("X-API-KEY", inst.getApiKey())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, resp ->
                         resp.bodyToMono(String.class).flatMap(body -> Mono.error(new RuntimeException(body))))
@@ -35,10 +39,11 @@ public class ApisixProxyService {
                 .block();
     }
 
-    public String put(String path, String resource, String resourceId, String body) {
+    public String put(String path, String resource, String resourceId, String body, Long instanceId) {
+        ApisixInstance inst = resolveInstance(instanceId);
         String result = webClient.put()
-                .uri(props.getAdminUrl() + path)
-                .header("X-API-KEY", props.getApiKey())
+                .uri(inst.getAdminUrl() + path)
+                .header("X-API-KEY", inst.getApiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
@@ -50,10 +55,11 @@ public class ApisixProxyService {
         return result;
     }
 
-    public String post(String path, String resource, String body) {
+    public String post(String path, String resource, String body, Long instanceId) {
+        ApisixInstance inst = resolveInstance(instanceId);
         String result = webClient.post()
-                .uri(props.getAdminUrl() + path)
-                .header("X-API-KEY", props.getApiKey())
+                .uri(inst.getAdminUrl() + path)
+                .header("X-API-KEY", inst.getApiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
@@ -65,10 +71,11 @@ public class ApisixProxyService {
         return result;
     }
 
-    public String patch(String path, String resource, String resourceId, String body) {
+    public String patch(String path, String resource, String resourceId, String body, Long instanceId) {
+        ApisixInstance inst = resolveInstance(instanceId);
         String result = webClient.patch()
-                .uri(props.getAdminUrl() + path)
-                .header("X-API-KEY", props.getApiKey())
+                .uri(inst.getAdminUrl() + path)
+                .header("X-API-KEY", inst.getApiKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
@@ -80,10 +87,11 @@ public class ApisixProxyService {
         return result;
     }
 
-    public void delete(String path, String resource, String resourceId) {
+    public void delete(String path, String resource, String resourceId, Long instanceId) {
+        ApisixInstance inst = resolveInstance(instanceId);
         webClient.delete()
-                .uri(props.getAdminUrl() + path)
-                .header("X-API-KEY", props.getApiKey())
+                .uri(inst.getAdminUrl() + path)
+                .header("X-API-KEY", inst.getApiKey())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, resp ->
                         resp.bodyToMono(String.class).flatMap(b -> Mono.error(new RuntimeException(b))))
