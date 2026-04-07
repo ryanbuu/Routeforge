@@ -29,6 +29,7 @@ function StatCard({ title, icon: Icon, value, color }: { title: string; icon: an
   )
 }
 
+
 export function DashboardPage() {
   const { data: routes } = useQuery({ queryKey: ['routes'], queryFn: () => routesApi.list() })
   const { data: upstreams } = useQuery({ queryKey: ['upstreams'], queryFn: () => upstreamsApi.list() })
@@ -48,7 +49,7 @@ export function DashboardPage() {
     <div>
       <PageHeader
         title="概览"
-        description="APISIX 资源统计"
+        description="APISIX 资源统计与运行状态"
         action={
           <Badge variant={isConnected ? 'success' : 'destructive'}>
             <Activity className="h-3 w-3 mr-1" />
@@ -56,10 +57,12 @@ export function DashboardPage() {
           </Badge>
         }
       />
-      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statItems.map(({ key, title, icon, color }) => (
-          <StatCard key={key} title={title} icon={icon} value={counts[key]} color={color} />
-        ))}
+      <div className="p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {statItems.map(({ key, title, icon, color }) => (
+            <StatCard key={key} title={title} icon={icon} value={counts[key]} color={color} />
+          ))}
+        </div>
       </div>
     </div>
   )

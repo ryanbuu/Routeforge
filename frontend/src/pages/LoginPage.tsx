@@ -30,7 +30,7 @@ export function LoginPage() {
           <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg mb-4">
             <Route className="h-7 w-7 text-white" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground/90">RouteForge</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground/90">Routeforge</h1>
           <p className="text-sm text-muted-foreground mt-1">APISIX Dashboard</p>
         </div>
 

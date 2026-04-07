@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { InstanceProvider } from '@/contexts/InstanceContext'
 import { AppLayout } from '@/components/layout/AppLayout'
@@ -12,9 +12,10 @@ import { PluginsPage } from '@/pages/PluginsPage'
 import { SslPage } from '@/pages/SslPage'
 import { AuditPage } from '@/pages/AuditPage'
 import { InstancesPage } from '@/pages/InstancesPage'
+import { UsersPage } from '@/pages/UsersPage'
 
 export default function App() {
-  const { username, loading } = useAuth()
+  const { username, isAdmin, loading } = useAuth()
 
   if (loading) {
     return (
@@ -40,7 +41,8 @@ export default function App() {
           <Route path="/plugins" element={<PluginsPage />} />
           <Route path="/ssl" element={<SslPage />} />
           <Route path="/audit" element={<AuditPage />} />
-          <Route path="/instances" element={<InstancesPage />} />
+          <Route path="/instances" element={isAdmin ? <InstancesPage /> : <Navigate to="/" replace />} />
+          <Route path="/users" element={isAdmin ? <UsersPage /> : <Navigate to="/" replace />} />
         </Route>
       </Routes>
     </InstanceProvider>

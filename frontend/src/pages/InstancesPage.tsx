@@ -214,7 +214,7 @@ export function InstancesPage() {
                 placeholder="http://127.0.0.1:9180"
               />
             </div>
-            <div className="space-y-1.5">
+<div className="space-y-1.5">
               <Label>
                 API Key
                 {!isCreating && (

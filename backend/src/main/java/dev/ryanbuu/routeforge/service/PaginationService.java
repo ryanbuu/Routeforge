@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PaginationService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaginationService.class);
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
@@ -41,6 +44,7 @@ public class PaginationService {
             result.put("totalPages", totalPages);
             return mapper.writeValueAsString(result);
         } catch (Exception e) {
+            log.error("Failed to paginate APISIX response: {}", e.getMessage(), e);
             return apisixJson;
         }
     }

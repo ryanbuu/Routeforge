@@ -1,4 +1,4 @@
-# RouteForge
+# Routeforge
 
 A modern dashboard for [Apache APISIX](https://apisix.apache.org/) built with React and Spring Boot. Manage routes, upstreams, services, consumers, plugins, and SSL certificates through an intuitive visual interface with a Liquid Glass UI.
 
@@ -39,8 +39,8 @@ A modern dashboard for [Apache APISIX](https://apisix.apache.org/) built with Re
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/RouteForge.git
-cd RouteForge
+git clone https://github.com/your-username/Routeforge.git
+cd Routeforge
 ```
 
 ### 2. Configure the backend
@@ -80,7 +80,7 @@ Visit [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Docker Compose Deployment
 
-The quickest way to run RouteForge in production:
+The quickest way to run Routeforge in production:
 
 ```bash
 docker compose up -d
@@ -131,7 +131,7 @@ java -jar target/routeforge-*.jar
 ## Project Structure
 
 ```
-RouteForge/
+Routeforge/
 ├── backend/
 │   └── src/main/java/com/routeforge/
 │       ├── config/          # APISIX properties, WebClient, CORS

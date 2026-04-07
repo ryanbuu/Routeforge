@@ -39,7 +39,7 @@ public class ApisixInstance {
     public void setAdminUrl(String adminUrl) { this.adminUrl = adminUrl; }
     public String getApiKey() { return apiKey; }
     public void setApiKey(String apiKey) { this.apiKey = apiKey; }
-    public boolean isDefault() { return isDefault; }
+public boolean isDefault() { return isDefault; }
     public void setDefault(boolean isDefault) { this.isDefault = isDefault; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

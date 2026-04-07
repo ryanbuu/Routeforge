@@ -25,6 +25,24 @@ export const instancesApi = {
   setDefault: (id: number) => apiClient.put(`/instances/${id}/default`),
 }
 
+export interface AppUser {
+  id: number
+  username: string
+  role: string
+  instanceIds: number[]
+  createdAt?: string
+}
+
+export const usersApi = {
+  list: () => apiClient.get('/users').then(r => r.data) as Promise<AppUser[]>,
+  get: (id: number) => apiClient.get(`/users/${id}`).then(r => r.data) as Promise<AppUser>,
+  create: (body: { username: string; password: string; role?: string; instanceIds?: number[] }) =>
+    apiClient.post('/users', body).then(r => r.data),
+  update: (id: number, body: { username?: string; password?: string; role?: string; instanceIds?: number[] }) =>
+    apiClient.put(`/users/${id}`, body).then(r => r.data),
+  remove: (id: number) => apiClient.delete(`/users/${id}`),
+}
+
 export const routesApi = {
   list: (page?: number, size = 10) =>
     apiClient.get('/routes', { params: page != null ? { page, size } : undefined }).then(r => r.data),

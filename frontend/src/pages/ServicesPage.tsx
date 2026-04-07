@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -443,6 +443,8 @@ export function ServicesPage() {
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState<ServiceItem | null>(null)
   const [page, setPage] = useState(0)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+  const [deleteConfirmName, setDeleteConfirmName] = useState('')
 
   const { data, isLoading } = useQuery({
     queryKey: ['services', page],
@@ -503,7 +505,11 @@ export function ServicesPage() {
               return (
                 <TableRow key={id}>
                   <TableCell className="text-muted-foreground text-xs">{page * 10 + idx + 1}</TableCell>
-                  <TableCell>{item.value?.name || '-'}</TableCell>
+                  <TableCell>
+                    {item.value?.name
+                      ? <span className="inline-block bg-white/50 border border-white/30 rounded-md px-2 py-0.5 text-sm font-semibold text-foreground/80">{item.value.name}</span>
+                      : <span className="text-muted-foreground">-</span>}
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-xs">{upSummary.label}</Badge>
                   </TableCell>
@@ -523,7 +529,7 @@ export function ServicesPage() {
                     <Button variant="ghost" size="icon" onClick={() => { setEditing(item); setOpen(true) }}>
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(id)}>
+                    <Button variant="ghost" size="icon" onClick={() => { setDeleteTarget({ id, name: item.value?.name || id }); setDeleteConfirmName('') }}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </TableCell>
@@ -554,6 +560,41 @@ export function ServicesPage() {
             <DialogTitle>{editing ? '编辑服务' : '新建服务'}</DialogTitle>
           </DialogHeader>
           <ServiceForm initial={editing} onSave={handleSave} onClose={() => setOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+      {/* 删除确认 */}
+      <Dialog open={deleteTarget !== null} onOpenChange={() => setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>确认删除服务</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <p className="text-sm text-muted-foreground">
+              此操作不可撤销。请输入服务名称 <span className="font-semibold text-foreground">{deleteTarget?.name}</span> 以确认删除。
+            </p>
+            <Input
+              value={deleteConfirmName}
+              onChange={e => setDeleteConfirmName(e.target.value)}
+              placeholder={deleteTarget?.name}
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>取消</Button>
+            <Button
+              variant="destructive"
+              disabled={deleteConfirmName !== deleteTarget?.name}
+              onClick={() => {
+                if (deleteTarget) {
+                  deleteMutation.mutate(deleteTarget.id)
+                  setDeleteTarget(null)
+                }
+              }}
+            >
+              删除
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
