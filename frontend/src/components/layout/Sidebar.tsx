@@ -12,10 +12,14 @@ import {
   UserCog,
   LogOut,
   ChevronDown,
+  Sun,
+  Moon,
+  Monitor,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
 import { useInstance } from '@/contexts/InstanceContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
 
 const navItems = [
@@ -34,9 +38,16 @@ const adminNavItems = [
   { to: '/users', icon: UserCog, label: '人员管理' },
 ]
 
+const themeOptions = [
+  { value: 'light' as const, icon: Sun, label: '亮色' },
+  { value: 'dark' as const, icon: Moon, label: '暗色' },
+  { value: 'system' as const, icon: Monitor, label: '系统' },
+]
+
 export function Sidebar() {
   const { username, isAdmin, logout } = useAuth()
   const { instances, current, setCurrent } = useInstance()
+  const { theme, setTheme } = useTheme()
   const [showPicker, setShowPicker] = useState(false)
   const pickerRef = useRef<HTMLDivElement>(null)
 
@@ -68,7 +79,7 @@ export function Sidebar() {
           <button
             onClick={() => setShowPicker(!showPicker)}
             className="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-[12px] font-medium
-              glass-subtle hover:bg-white/40 transition-colors duration-200"
+              glass-subtle hover:bg-white/40 dark:hover:bg-white/10 transition-colors duration-200"
           >
             <div className="flex items-center gap-2 min-w-0">
               <div className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
@@ -83,8 +94,8 @@ export function Sidebar() {
                   key={inst.id}
                   onClick={() => { setCurrent(inst); setShowPicker(false) }}
                   className={cn(
-                    "w-full text-left px-3 py-2 text-[12px] hover:bg-white/40 transition-colors duration-150 flex items-center gap-2",
-                    inst.id === current?.id && "bg-white/30 font-medium"
+                    "w-full text-left px-3 py-2 text-[12px] hover:bg-white/40 dark:hover:bg-white/10 transition-colors duration-150 flex items-center gap-2",
+                    inst.id === current?.id && "bg-white/30 dark:bg-white/10 font-medium"
                   )}
                 >
                   <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", inst.id === current?.id ? "bg-emerald-500" : "bg-muted-foreground/30")} />
@@ -109,7 +120,7 @@ export function Sidebar() {
                 'flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-200',
                 isActive
                   ? 'glass text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/30'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/30 dark:hover:bg-white/8'
               )
             }
           >
@@ -120,7 +131,7 @@ export function Sidebar() {
         {isAdmin && (
           <>
             <div className="pt-2 pb-1 px-3">
-              <div className="border-t border-white/20" />
+              <div className="border-t border-white/20 dark:border-white/8" />
             </div>
             {adminNavItems.map(({ to, icon: Icon, label }) => (
               <NavLink
@@ -131,7 +142,7 @@ export function Sidebar() {
                     'flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-200',
                     isActive
                       ? 'glass text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-white/30'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/30 dark:hover:bg-white/8'
                   )
                 }
               >
@@ -144,7 +155,26 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-3 space-y-2">
+      <div className="px-3 py-3 space-y-2.5">
+        {/* Theme switcher */}
+        <div className="flex items-center gap-1 px-1 py-1 rounded-xl glass-inset">
+          {themeOptions.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setTheme(opt.value)}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-[11px] font-medium transition-all duration-200',
+                theme === opt.value
+                  ? 'glass text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+              title={opt.label}
+            >
+              <opt.icon className="h-3 w-3" />
+              <span>{opt.label}</span>
+            </button>
+          ))}
+        </div>
         <div className="flex items-center justify-between px-2">
           <span className="text-[12px] text-muted-foreground/80 truncate">{username}</span>
           <button

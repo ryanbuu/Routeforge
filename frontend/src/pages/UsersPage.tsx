@@ -14,16 +14,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ShieldCheck, User } from 'lucide-react'
 
 interface FormState {
   username: string
@@ -127,68 +119,63 @@ export function UsersPage() {
       />
 
       <div className="p-6">
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">#</TableHead>
-                  <TableHead>用户名</TableHead>
-                  <TableHead>角色</TableHead>
-                  <TableHead>可访问实例</TableHead>
-                  <TableHead className="w-32 text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user, idx) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="text-muted-foreground">{idx + 1}</TableCell>
-                    <TableCell className="font-medium">{user.username}</TableCell>
-                    <TableCell>
-                      <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
-                        {user.role === 'ADMIN' ? '超级管理员' : '普通用户'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {user.role === 'ADMIN' ? (
-                        <span className="text-sm text-muted-foreground">所有实例</span>
-                      ) : user.instanceIds.length > 0 ? (
-                        <div className="flex gap-1 flex-wrap">
-                          {user.instanceIds.map(id => (
-                            <Badge key={id} variant="outline" className="text-xs">
-                              {instanceNameMap.get(id) || id}
-                            </Badge>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-sm text-muted-foreground/50">无</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => openEdit(user)}>
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        {user.username !== 'admin' && (
-                          <Button variant="ghost" size="sm" onClick={() => { setDeleteTarget({ id: user.id, name: user.username }); setDeleteConfirmName('') }}>
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </Button>
-                        )}
+        {users.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">暂无用户</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {users.map(user => (
+              <Card key={user.id} className="glass-heavy overflow-hidden">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        'h-10 w-10 rounded-xl flex items-center justify-center shadow-sm',
+                        user.role === 'ADMIN'
+                          ? 'bg-gradient-to-br from-blue-500 to-indigo-600'
+                          : 'bg-gradient-to-br from-slate-400 to-slate-500 dark:from-slate-500 dark:to-slate-600'
+                      )}>
+                        {user.role === 'ADMIN'
+                          ? <ShieldCheck className="h-5 w-5 text-white" />
+                          : <User className="h-5 w-5 text-white" />
+                        }
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {users.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      暂无用户
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                      <div>
+                        <div className="font-semibold text-[15px] text-foreground">{user.username}</div>
+                        <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'} className="mt-0.5">
+                          {user.role === 'ADMIN' ? '超级管理员' : '普通用户'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => openEdit(user)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      {user.username !== 'admin' && (
+                        <Button variant="ghost" size="sm" onClick={() => { setDeleteTarget({ id: user.id, name: user.username }); setDeleteConfirmName('') }}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground mb-1.5">可访问实例</div>
+                  {user.role === 'ADMIN' ? (
+                    <span className="text-sm text-muted-foreground">所有实例</span>
+                  ) : user.instanceIds.length > 0 ? (
+                    <div className="flex gap-1.5 flex-wrap">
+                      {user.instanceIds.map(id => (
+                        <Badge key={id} variant="outline" className="text-xs">
+                          {instanceNameMap.get(id) || id}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground/50">无</span>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Create/Edit Dialog */}
@@ -236,7 +223,7 @@ export function UsersPage() {
                       'flex-1 py-1.5 rounded-xl border text-sm font-medium transition-all duration-200',
                       form.role === opt.value
                         ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                        : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                        : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
                     )}
                   >
                     {opt.label}

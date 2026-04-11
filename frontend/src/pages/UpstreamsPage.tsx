@@ -163,7 +163,7 @@ function UpstreamForm({ initial, onSave, onClose }: { initial?: any; onSave: (id
                   'px-2.5 py-1 rounded-lg border text-xs font-medium transition-all duration-200',
                   form.type === t
                     ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                    : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                    : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
                 )}
               >
                 {t}
@@ -183,7 +183,7 @@ function UpstreamForm({ initial, onSave, onClose }: { initial?: any; onSave: (id
                   'px-2.5 py-1 rounded-lg border text-xs font-medium transition-all duration-200',
                   form.scheme === s
                     ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                    : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                    : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
                 )}
               >
                 {s}
@@ -208,7 +208,7 @@ function UpstreamForm({ initial, onSave, onClose }: { initial?: any; onSave: (id
                     'px-2 py-0.5 rounded-lg border text-[11px] font-medium transition-all duration-200',
                     form.hashOn === h
                       ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                      : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                      : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
                   )}
                 >
                   {h}

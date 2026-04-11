@@ -32,6 +32,45 @@
     --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.10), 0 4px 16px rgba(0, 0, 0, 0.06);
     --glass-blur: 20px;
     --glass-highlight: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+
+    /* Neutral tint for glass surfaces */
+    --glass-tint: 255, 255, 255;
+    --glass-inset-bg: rgba(0, 0, 0, 0.03);
+    --glass-inset-border: rgba(0, 0, 0, 0.04);
+    --glass-inset-shadow: rgba(0, 0, 0, 0.06);
+  }
+
+  .dark {
+      --background: 220 20% 8%;
+      --foreground: 220 15% 90%;
+      --card: 220 18% 12%;
+      --card-foreground: 220 15% 90%;
+      --border: 0 0% 100% / 0.08;
+      --input: 220 15% 16%;
+      --primary: 215 90% 60%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 220 15% 16%;
+      --secondary-foreground: 220 15% 85%;
+      --muted: 220 15% 18%;
+      --muted-foreground: 220 10% 55%;
+      --accent: 0 0% 100% / 0.08;
+      --accent-foreground: 220 15% 90%;
+      --destructive: 0 72% 56%;
+      --destructive-foreground: 0 0% 100%;
+      --ring: 215 90% 60%;
+
+      --glass-bg: rgba(30, 35, 50, 0.6);
+      --glass-bg-heavy: rgba(25, 30, 45, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-border-subtle: rgba(255, 255, 255, 0.06);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+      --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
+      --glass-highlight: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
+
+      --glass-tint: 30, 35, 50;
+      --glass-inset-bg: rgba(255, 255, 255, 0.03);
+      --glass-inset-border: rgba(255, 255, 255, 0.05);
+      --glass-inset-shadow: rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -41,9 +80,12 @@
   }
   body {
     @apply text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-      "Helvetica Neue", Arial, sans-serif;
+    font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont,
+      "PingFang SC", "Helvetica Neue", "Noto Sans SC", "Microsoft YaHei", sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
     /* Vibrant mesh gradient background */
     background:
       radial-gradient(ellipse at 20% 0%, rgba(120, 180, 255, 0.25) 0%, transparent 50%),
@@ -53,6 +95,15 @@
       hsl(220, 20%, 96%);
     background-attachment: fixed;
     min-height: 100vh;
+  }
+
+  .dark body {
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(60, 100, 180, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 10%, rgba(100, 70, 180, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 90%, rgba(60, 120, 180, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 10% 80%, rgba(100, 80, 180, 0.08) 0%, transparent 50%),
+        hsl(220, 20%, 8%);
   }
 }
 
@@ -73,7 +124,7 @@
     box-shadow: var(--glass-shadow);
   }
   .glass-subtle {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(var(--glass-tint), 0.3);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border-subtle);
@@ -91,11 +142,11 @@
     z-index: 1;
   }
   .glass-inset {
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--glass-inset-bg);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--glass-inset-border);
+    box-shadow: inset 0 1px 3px var(--glass-inset-shadow);
   }
 }
 
@@ -114,9 +165,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(128, 128, 128, 0.25);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(128, 128, 128, 0.4);
 }

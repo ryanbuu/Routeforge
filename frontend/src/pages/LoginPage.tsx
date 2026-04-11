@@ -42,7 +42,7 @@ export function LoginPage() {
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              className="flex h-10 w-full rounded-xl border bg-white/40 backdrop-blur-sm px-3 py-2 text-sm
+              className="flex h-10 w-full rounded-xl border bg-white/40 dark:bg-white/10 backdrop-blur-sm px-3 py-2 text-sm
                 ring-offset-background placeholder:text-muted-foreground
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-1
                 transition-shadow duration-200"
@@ -57,7 +57,7 @@ export function LoginPage() {
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="flex h-10 w-full rounded-xl border bg-white/40 backdrop-blur-sm px-3 py-2 text-sm
+              className="flex h-10 w-full rounded-xl border bg-white/40 dark:bg-white/10 backdrop-blur-sm px-3 py-2 text-sm
                 ring-offset-background placeholder:text-muted-foreground
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-1
                 transition-shadow duration-200"
@@ -66,7 +66,7 @@ export function LoginPage() {
           </div>
 
           {error && (
-            <div className="text-sm text-red-500 bg-red-50/50 rounded-lg px-3 py-2">
+            <div className="text-sm text-red-500 bg-red-50/50 dark:bg-red-950/30 rounded-lg px-3 py-2">
               {error}
             </div>
           )}

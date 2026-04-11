@@ -210,7 +210,7 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
                 'flex-1 py-1.5 rounded-xl border text-sm font-medium transition-all duration-200',
                 form.upstreamMode === opt.value
                   ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                  : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                  : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
               )}
             >
               {opt.label}
@@ -240,7 +240,7 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
                       'px-2.5 py-1 rounded-lg border text-xs font-medium transition-all duration-200',
                       form.upstreamType === t
                         ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                        : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                        : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
                     )}
                   >
                     {t}
@@ -260,7 +260,7 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
                       'px-2.5 py-1 rounded-lg border text-xs font-medium transition-all duration-200',
                       form.upstreamScheme === s
                         ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                        : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                        : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
                     )}
                   >
                     {s}
@@ -368,7 +368,7 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
                     ? opt.value
                       ? 'bg-emerald-500/20 text-emerald-700 border-emerald-500/30 shadow-sm'
                       : 'bg-gray-500/15 text-gray-600 border-gray-500/20 shadow-sm'
-                    : 'bg-white/30 text-muted-foreground border-white/30 hover:bg-white/50'
+                    : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
                 )}
               >
                 {opt.label}
@@ -507,7 +507,7 @@ export function ServicesPage() {
                   <TableCell className="text-muted-foreground text-xs">{page * 10 + idx + 1}</TableCell>
                   <TableCell>
                     {item.value?.name
-                      ? <span className="inline-block bg-white/50 border border-white/30 rounded-md px-2 py-0.5 text-sm font-semibold text-foreground/80">{item.value.name}</span>
+                      ? <span className="inline-block bg-white/50 dark:bg-white/10 border border-white/30 dark:border-white/10 rounded-md px-2 py-0.5 text-sm font-semibold text-foreground/80">{item.value.name}</span>
                       : <span className="text-muted-foreground">-</span>}
                   </TableCell>
                   <TableCell>
