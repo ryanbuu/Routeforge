@@ -18,14 +18,13 @@ import {
   Users,
   Shield,
   Globe,
-  Clock,
   FileJson,
 } from 'lucide-react'
 
-const ACTION_CONFIG: Record<string, { label: string; icon: typeof Plus; color: string; bg: string }> = {
-  CREATE: { label: '创建', icon: Plus,   color: 'text-emerald-600', bg: 'bg-emerald-500/15 border-emerald-500/25' },
-  UPDATE: { label: '更新', icon: Pencil, color: 'text-blue-600',    bg: 'bg-blue-500/15 border-blue-500/25' },
-  DELETE: { label: '删除', icon: Trash2,  color: 'text-red-500',     bg: 'bg-red-500/15 border-red-500/25' },
+const ACTION_CONFIG: Record<string, { label: string; icon: typeof Plus; colorClass: string }> = {
+  CREATE: { label: '创建', icon: Plus,   colorClass: 'text-[#248a3d] dark:text-[#30d158] bg-[#30d158]/10 border-[#30d158]/25' },
+  UPDATE: { label: '更新', icon: Pencil, colorClass: 'text-primary bg-primary/10 border-primary/25' },
+  DELETE: { label: '删除', icon: Trash2, colorClass: 'text-[#c5281c] dark:text-[#ff453a] bg-[#ff3b30]/10 border-[#ff3b30]/25' },
 }
 
 const RESOURCE_CONFIG: Record<string, { label: string; icon: typeof Route }> = {
@@ -97,7 +96,6 @@ function tryParsePayloadName(payload: string | null): string | null {
   if (!payload) return null
   try {
     const obj = JSON.parse(payload)
-    // For UPDATE payloads with before/after structure, check both
     if (obj.before?.name) return obj.before.name
     if (obj.after?.name) return obj.after.name
     return obj.name || null
@@ -147,43 +145,42 @@ function tryParseDiffPayload(payload: string | null): { before: any; after: any 
 function DiffView({ payload }: { payload: string }) {
   const diff = tryParseDiffPayload(payload)
   if (!diff) {
-    // Fallback: plain JSON
     try {
-      return <pre className="text-xs font-mono whitespace-pre-wrap break-all">{JSON.stringify(JSON.parse(payload), null, 2)}</pre>
+      return <pre className="text-[12px] font-mono whitespace-pre-wrap break-all text-foreground/80">{JSON.stringify(JSON.parse(payload), null, 2)}</pre>
     } catch {
-      return <pre className="text-xs font-mono whitespace-pre-wrap break-all">{payload}</pre>
+      return <pre className="text-[12px] font-mono whitespace-pre-wrap break-all text-foreground/80">{payload}</pre>
     }
   }
 
   const entries = computeDiff(diff.before, diff.after)
 
   if (entries.length === 0) {
-    return <div className="text-sm text-muted-foreground py-4 text-center">无变更</div>
+    return <div className="text-[14px] text-muted-foreground py-4 text-center">无变更</div>
   }
 
   return (
     <div className="space-y-2">
       {entries.map(entry => (
-        <div key={entry.key} className="rounded-lg border border-white/20 overflow-hidden">
-          <div className="px-3 py-1.5 bg-white/20 dark:bg-white/5 text-xs font-semibold text-foreground/80 flex items-center gap-2">
+        <div key={entry.key} className="rounded-lg border border-foreground/[0.08] overflow-hidden">
+          <div className="px-3.5 py-2 bg-foreground/[0.03] dark:bg-white/[0.04] text-[12px] font-semibold text-foreground/80 flex items-center gap-2">
             <span className="font-mono">{entry.key}</span>
-            {entry.type === 'added' && <Badge variant="success" className="text-[10px] px-1.5 py-0">新增</Badge>}
-            {entry.type === 'removed' && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">删除</Badge>}
-            {entry.type === 'changed' && <Badge className="text-[10px] px-1.5 py-0">变更</Badge>}
+            {entry.type === 'added' && <Badge variant="success">新增</Badge>}
+            {entry.type === 'removed' && <Badge variant="destructive">删除</Badge>}
+            {entry.type === 'changed' && <Badge>变更</Badge>}
           </div>
-          <div className="px-3 py-2 text-xs font-mono space-y-1">
+          <div className="px-3.5 py-2.5 text-[12px] font-mono space-y-1">
             {(entry.type === 'removed' || entry.type === 'changed') && (
               <div className="flex gap-2">
-                <span className="text-red-500 shrink-0">-</span>
-                <span className="text-red-600/80 whitespace-pre-wrap break-all bg-red-500/5 rounded px-1">
+                <span className="text-[#ff3b30] shrink-0">−</span>
+                <span className="text-[#c5281c] dark:text-[#ff453a] whitespace-pre-wrap break-all bg-[#ff3b30]/5 rounded px-1.5 py-0.5">
                   {typeof entry.before === 'object' ? JSON.stringify(entry.before, null, 2) : String(entry.before)}
                 </span>
               </div>
             )}
             {(entry.type === 'added' || entry.type === 'changed') && (
               <div className="flex gap-2">
-                <span className="text-emerald-500 shrink-0">+</span>
-                <span className="text-emerald-600/80 whitespace-pre-wrap break-all bg-emerald-500/5 rounded px-1">
+                <span className="text-[#30d158] shrink-0">+</span>
+                <span className="text-[#248a3d] dark:text-[#30d158] whitespace-pre-wrap break-all bg-[#30d158]/5 rounded px-1.5 py-0.5">
                   {typeof entry.after === 'object' ? JSON.stringify(entry.after, null, 2) : String(entry.after)}
                 </span>
               </div>
@@ -214,7 +211,7 @@ export function AuditPage() {
   return (
     <div>
       <PageHeader title="审计日志" description="记录所有对 APISIX 的写操作" />
-      <div className="p-6">
+      <div className="px-10 pb-10">
         {/* Filter tabs */}
         <div className="flex gap-1.5 mb-6 flex-wrap">
           {FILTER_TABS.map(tab => (
@@ -222,10 +219,10 @@ export function AuditPage() {
               key={tab.key || 'all'}
               onClick={() => { setResource(tab.key); setPage(0) }}
               className={cn(
-                'px-3 py-1.5 rounded-xl text-xs font-medium border transition-all duration-200',
+                'px-3.5 py-1.5 rounded-md text-[13px] font-medium border transition-colors duration-150',
                 resource === tab.key
-                  ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                  : 'bg-white/30 text-muted-foreground border-white/20 dark:border-white/8 hover:bg-white/50 dark:hover:bg-white/12'
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-transparent text-foreground/65 border-foreground/10 hover:bg-foreground/5'
               )}
             >
               {tab.label}
@@ -233,17 +230,16 @@ export function AuditPage() {
           ))}
         </div>
 
-        {/* Timeline */}
         {isLoading ? (
-          <div className="text-center text-muted-foreground py-12">加载中...</div>
+          <div className="text-center text-muted-foreground py-16 text-[15px]">加载中…</div>
         ) : items.length === 0 ? (
-          <div className="text-center text-muted-foreground py-12">暂无审计记录</div>
+          <div className="text-center text-muted-foreground py-16 text-[15px]">暂无审计记录</div>
         ) : (
           <div className="relative">
             {/* vertical line */}
-            <div className="absolute left-[23px] top-2 bottom-2 w-px bg-gradient-to-b from-border/60 via-border/30 to-transparent" />
+            <div className="absolute left-[11px] top-3 bottom-3 w-px bg-foreground/[0.08]" />
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {items.map((item: any) => {
                 const actionCfg = ACTION_CONFIG[item.action] || ACTION_CONFIG.UPDATE
                 const resourceCfg = RESOURCE_CONFIG[item.resource] || { label: item.resource, icon: Globe }
@@ -253,7 +249,6 @@ export function AuditPage() {
                 const relative = relativeTime(item.createdAt)
                 const desc = buildDescription(item)
 
-                // Date separator
                 let showDateHeader = false
                 if (date !== lastDate) {
                   lastDate = date
@@ -263,55 +258,48 @@ export function AuditPage() {
                 return (
                   <div key={item.id}>
                     {showDateHeader && (
-                      <div className="flex items-center gap-3 py-2 pl-[14px]">
-                        <div className="h-[18px] w-[18px] rounded-full bg-white/60 dark:bg-white/10 border border-white/40 dark:border-white/10 flex items-center justify-center">
-                          <Clock className="h-2.5 w-2.5 text-muted-foreground" />
-                        </div>
-                        <span className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">{date}</span>
+                      <div className="pl-10 pt-5 pb-2">
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-apple-micro">{date}</span>
                       </div>
                     )}
-                    <div className="flex items-start gap-3 group pl-[14px]">
+                    <div className="flex items-start gap-3 group">
                       {/* Timeline dot */}
                       <div className={cn(
-                        'h-[18px] w-[18px] rounded-full border flex items-center justify-center shrink-0 mt-3 transition-all duration-200',
-                        actionCfg.bg
+                        'h-[22px] w-[22px] rounded-full border flex items-center justify-center shrink-0 mt-3 transition-colors',
+                        actionCfg.colorClass
                       )}>
-                        <ActionIcon className={cn('h-2.5 w-2.5', actionCfg.color)} />
+                        <ActionIcon className="h-3 w-3" />
                       </div>
 
                       {/* Card */}
-                      <div className="flex-1 rounded-xl glass-subtle px-4 py-3 group-hover:bg-white/40 dark:group-hover:bg-white/10 transition-all duration-200 mb-1">
+                      <div className="flex-1 rounded-lg bg-card px-4 py-3 border border-foreground/[0.04] dark:border-white/[0.04] group-hover:border-foreground/[0.08] transition-colors duration-150 mb-0.5">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            {/* Main line */}
                             <div className="flex items-center gap-2 flex-wrap">
                               <Badge
                                 variant={item.action === 'CREATE' ? 'success' : item.action === 'DELETE' ? 'destructive' : 'default'}
-                                className="text-[10px] px-1.5 py-0"
                               >
                                 {actionCfg.label}
                               </Badge>
-                              <div className="flex items-center gap-1.5 text-sm">
+                              <div className="flex items-center gap-1.5 text-[14px]">
                                 <ResourceIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                                <span className="font-medium">{desc.text}</span>
+                                <span className="font-medium text-foreground tracking-apple-body">{desc.text}</span>
                                 {desc.name && (
-                                  <span className="bg-white/50 dark:bg-white/10 border border-white/30 dark:border-white/10 rounded-md px-1.5 py-0.5 text-xs font-semibold text-foreground/80">
+                                  <span className="text-foreground/80 font-semibold tracking-apple-body">
                                     {desc.name}
                                   </span>
                                 )}
                               </div>
                             </div>
 
-                            {/* Detail line */}
-                            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                              {item.resourceId && (
-                                <span className="font-mono text-[11px]">ID: {item.resourceId}</span>
-                              )}
-                            </div>
+                            {item.resourceId && (
+                              <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground font-mono">
+                                ID: {item.resourceId}
+                              </div>
+                            )}
                           </div>
 
-                          {/* Right side: time + action */}
-                          <div className="flex items-center gap-2 shrink-0">
+                          <div className="flex items-center gap-3 shrink-0">
                             {item.payload && (
                               <button
                                 onClick={() => setDetailPayload({ payload: item.payload, action: item.action })}
@@ -322,8 +310,8 @@ export function AuditPage() {
                               </button>
                             )}
                             <div className="text-right">
-                              <div className="text-xs text-muted-foreground font-mono">{time}</div>
-                              <div className="text-[10px] text-muted-foreground/50">{relative}</div>
+                              <div className="text-[12px] text-foreground/60 font-mono tabular-nums">{time}</div>
+                              <div className="text-[10px] text-muted-foreground/60 tracking-apple-micro">{relative}</div>
                             </div>
                           </div>
                         </div>
@@ -336,15 +324,14 @@ export function AuditPage() {
           </div>
         )}
 
-        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/15 dark:border-white/8">
-            <span className="text-sm text-muted-foreground">共 {total} 条记录</span>
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-foreground/[0.06]">
+            <span className="text-[13px] text-muted-foreground tracking-apple-caption">共 {total} 条记录</span>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-muted-foreground">{page + 1} / {totalPages}</span>
+              <span className="text-[13px] text-muted-foreground">{page + 1} / {totalPages}</span>
               <Button variant="outline" size="icon" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -353,7 +340,6 @@ export function AuditPage() {
         )}
       </div>
 
-      {/* Payload detail dialog */}
       <Dialog open={detailPayload !== null} onOpenChange={() => setDetailPayload(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -361,11 +347,11 @@ export function AuditPage() {
               {detailPayload?.action === 'UPDATE' ? '变更详情' : detailPayload?.action === 'DELETE' ? '删除快照' : '操作详情'}
             </DialogTitle>
           </DialogHeader>
-          <div className="rounded-xl glass-inset p-4 overflow-auto max-h-[60vh]">
+          <div className="rounded-lg bg-[#fafafc] dark:bg-[#2a2a2d] border border-foreground/[0.06] dark:border-white/[0.08] p-4 overflow-auto max-h-[60vh]">
             {detailPayload?.action === 'UPDATE' ? (
               <DiffView payload={detailPayload.payload} />
             ) : (
-              <pre className="text-xs font-mono whitespace-pre-wrap break-all">
+              <pre className="text-[12px] font-mono whitespace-pre-wrap break-all text-foreground/80">
                 {(() => {
                   try { return JSON.stringify(JSON.parse(detailPayload?.payload || ''), null, 2) }
                   catch { return detailPayload?.payload }

@@ -2,17 +2,22 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
+/*
+ * Apple-style badge: small tag. Apple rarely uses colored chips,
+ * so we default to neutral. Accent variants remain minimal.
+ */
+
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors',
+  'inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium tracking-apple-micro whitespace-nowrap',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary/15 text-primary backdrop-blur-sm',
-        secondary: 'border-white/30 dark:border-white/10 bg-white/40 dark:bg-white/10 text-secondary-foreground backdrop-blur-sm',
-        destructive: 'border-transparent bg-red-500/15 text-red-600 dark:text-red-400 backdrop-blur-sm',
-        outline: 'border-white/40 dark:border-white/10 bg-white/25 dark:bg-white/5 text-foreground/80 backdrop-blur-sm',
-        success: 'border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 backdrop-blur-sm',
-        warning: 'border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-400 backdrop-blur-sm',
+        default: 'bg-primary/10 text-primary',
+        secondary: 'bg-foreground/5 text-foreground/80 dark:bg-white/10 dark:text-white/85',
+        destructive: 'bg-destructive/10 text-destructive',
+        outline: 'border border-foreground/15 text-foreground/70',
+        success: 'bg-[#30d158]/[0.12] text-[#248a3d] dark:text-[#30d158]',
+        warning: 'bg-[#ff9500]/[0.12] text-[#c26500] dark:text-[#ff9f0a]',
       },
     },
     defaultVariants: { variant: 'default' },

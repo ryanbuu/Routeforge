@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Trash2, Puzzle, Pencil } from 'lucide-react'
+import { Plus, Trash2, Pencil } from 'lucide-react'
 
 export function PluginsPage() {
   const qc = useQueryClient()
@@ -70,47 +70,52 @@ export function PluginsPage() {
       <PageHeader
         title="插件配置"
         description="管理全局规则与插件"
-        action={<Button size="sm" onClick={openCreate}><Plus className="h-4 w-4 mr-1" />新建全局规则</Button>}
+        action={
+          <Button onClick={openCreate}>
+            <Plus className="h-4 w-4 mr-1" />新建全局规则
+          </Button>
+        }
       />
-      <div className="p-6">
+      <div className="px-10 pb-10">
         {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">加载中...</div>
+          <div className="text-center py-16 text-muted-foreground text-[15px]">加载中…</div>
         ) : rules.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">暂无全局规则</div>
+          <div className="text-center py-16 text-muted-foreground text-[15px]">暂无全局规则</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {rules.map((item: any) => {
               const id = item.key?.split('/').pop() || item.value?.id
               const plugins = Object.keys(item.value?.plugins || {})
               return (
-                <Card key={id} className="glass-heavy overflow-hidden">
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
-                          <Puzzle className="h-5 w-5 text-white" />
+                <Card key={id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[21px] font-bold leading-[1.19] tracking-apple-card-title text-foreground truncate">
+                          全局规则 #{id}
                         </div>
-                        <div>
-                          <div className="font-semibold text-[15px] text-foreground">全局规则 #{id}</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">{plugins.length} 个插件</div>
+                        <div className="text-[13px] text-muted-foreground mt-1 tracking-apple-caption">
+                          {plugins.length} 个插件
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => openEdit(item)}>
-                          <Pencil className="h-3.5 w-3.5" />
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(item)}>
+                          <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => { setDeleteTarget({ id }); setDeleteConfirmId('') }}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        <Button variant="ghost" size="icon" onClick={() => { setDeleteTarget({ id }); setDeleteConfirmId('') }}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    <div className="text-xs text-muted-foreground mb-1.5">已启用插件</div>
+                    <div className="text-[11px] font-semibold uppercase tracking-apple-micro text-muted-foreground mb-2">
+                      已启用插件
+                    </div>
                     {plugins.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
-                        {plugins.map(p => <Badge key={p} variant="secondary" className="text-xs">{p}</Badge>)}
+                        {plugins.map(p => <Badge key={p} variant="outline">{p}</Badge>)}
                       </div>
                     ) : (
-                      <span className="text-sm text-muted-foreground/50">无</span>
+                      <span className="text-[14px] text-muted-foreground/60 tracking-apple-caption">无</span>
                     )}
                   </CardContent>
                 </Card>
@@ -120,7 +125,6 @@ export function PluginsPage() {
         )}
       </div>
 
-      {/* Create/Edit Dialog */}
       <Dialog open={open} onOpenChange={closeDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>{editing ? '编辑全局规则' : '新建全局规则'}</DialogTitle></DialogHeader>
@@ -131,8 +135,8 @@ export function PluginsPage() {
             </div>
             <div className="space-y-1.5">
               <Label>配置 (JSON)</Label>
-              <Textarea value={json} onChange={e => setJson(e.target.value)} className="font-mono text-xs min-h-[240px] resize-none" />
-              {error && <p className="text-xs text-destructive">{error}</p>}
+              <Textarea value={json} onChange={e => setJson(e.target.value)} className="font-mono text-[12px] min-h-[240px] resize-none" />
+              {error && <p className="text-[11px] text-destructive">{error}</p>}
             </div>
           </div>
           <DialogFooter>
@@ -142,14 +146,13 @@ export function PluginsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
       <Dialog open={deleteTarget !== null} onOpenChange={() => setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>确认删除全局规则</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-2">
-            <p className="text-sm text-muted-foreground">
+          <div className="space-y-3">
+            <p className="text-[14px] text-muted-foreground tracking-apple-caption">
               此操作不可撤销。请输入规则 ID <span className="font-semibold text-foreground">{deleteTarget?.id}</span> 以确认删除。
             </p>
             <Input

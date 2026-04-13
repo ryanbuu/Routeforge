@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { Plus, Pencil, Trash2, ShieldCheck, User } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 
 interface FormState {
   username: string
@@ -118,58 +118,51 @@ export function UsersPage() {
         }
       />
 
-      <div className="p-6">
+      <div className="px-10 pb-10">
         {users.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">暂无用户</div>
+          <div className="text-center py-16 text-muted-foreground text-[15px]">暂无用户</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {users.map(user => (
-              <Card key={user.id} className="glass-heavy overflow-hidden">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        'h-10 w-10 rounded-xl flex items-center justify-center shadow-sm',
-                        user.role === 'ADMIN'
-                          ? 'bg-gradient-to-br from-blue-500 to-indigo-600'
-                          : 'bg-gradient-to-br from-slate-400 to-slate-500 dark:from-slate-500 dark:to-slate-600'
-                      )}>
-                        {user.role === 'ADMIN'
-                          ? <ShieldCheck className="h-5 w-5 text-white" />
-                          : <User className="h-5 w-5 text-white" />
-                        }
+              <Card key={user.id}>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[21px] font-bold leading-[1.19] tracking-apple-card-title text-foreground truncate">
+                        {user.username}
                       </div>
-                      <div>
-                        <div className="font-semibold text-[15px] text-foreground">{user.username}</div>
-                        <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'} className="mt-0.5">
+                      <div className="mt-1.5">
+                        <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
                           {user.role === 'ADMIN' ? '超级管理员' : '普通用户'}
                         </Badge>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(user)}>
-                        <Pencil className="h-3.5 w-3.5" />
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(user)}>
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       {user.username !== 'admin' && (
-                        <Button variant="ghost" size="sm" onClick={() => { setDeleteTarget({ id: user.id, name: user.username }); setDeleteConfirmName('') }}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        <Button variant="ghost" size="icon" onClick={() => { setDeleteTarget({ id: user.id, name: user.username }); setDeleteConfirmName('') }}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground mb-1.5">可访问实例</div>
+                  <div className="text-[11px] font-semibold uppercase tracking-apple-micro text-muted-foreground mb-2">
+                    可访问实例
+                  </div>
                   {user.role === 'ADMIN' ? (
-                    <span className="text-sm text-muted-foreground">所有实例</span>
+                    <span className="text-[14px] text-foreground/70 tracking-apple-caption">所有实例</span>
                   ) : user.instanceIds.length > 0 ? (
                     <div className="flex gap-1.5 flex-wrap">
                       {user.instanceIds.map(id => (
-                        <Badge key={id} variant="outline" className="text-xs">
+                        <Badge key={id} variant="outline">
                           {instanceNameMap.get(id) || id}
                         </Badge>
                       ))}
                     </div>
                   ) : (
-                    <span className="text-sm text-muted-foreground/50">无</span>
+                    <span className="text-[14px] text-muted-foreground/60 tracking-apple-caption">无</span>
                   )}
                 </CardContent>
               </Card>
@@ -184,7 +177,7 @@ export function UsersPage() {
           <DialogHeader>
             <DialogTitle>{isCreating ? '添加用户' : '编辑用户'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-4">
             <div className="space-y-1.5">
               <Label>用户名</Label>
               <Input
@@ -197,7 +190,7 @@ export function UsersPage() {
               <Label>
                 密码
                 {!isCreating && (
-                  <span className="ml-2 text-xs font-normal text-muted-foreground">留空则不修改</span>
+                  <span className="ml-2 text-[11px] font-normal text-muted-foreground">留空则不修改</span>
                 )}
               </Label>
               <Input
@@ -220,10 +213,10 @@ export function UsersPage() {
                     type="button"
                     onClick={() => setForm(f => ({ ...f, role: opt.value }))}
                     className={cn(
-                      'flex-1 py-1.5 rounded-xl border text-sm font-medium transition-all duration-200',
+                      'flex-1 h-10 rounded-md text-[14px] font-medium transition-colors duration-150 border',
                       form.role === opt.value
-                        ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                        : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-transparent text-foreground/70 border-foreground/10 hover:bg-foreground/5'
                     )}
                   >
                     {opt.label}
@@ -235,22 +228,22 @@ export function UsersPage() {
               <div className="space-y-1.5">
                 <Label>可访问的 APISIX 实例</Label>
                 {instances.length > 0 ? (
-                  <div className="space-y-1.5 rounded-2xl p-3 glass-inset max-h-40 overflow-auto">
+                  <div className="space-y-1 rounded-lg border border-foreground/10 p-2 max-h-40 overflow-auto bg-[#fafafc] dark:bg-[#2a2a2d]">
                     {instances.map(inst => (
-                      <label key={inst.id} className="flex items-center gap-2.5 text-sm cursor-pointer py-0.5">
+                      <label key={inst.id} className="flex items-center gap-2.5 text-[13px] cursor-pointer py-1.5 px-2 rounded hover:bg-foreground/[0.04]">
                         <input
                           type="checkbox"
                           checked={form.instanceIds.includes(inst.id)}
                           onChange={() => toggleInstance(inst.id)}
-                          className="rounded"
+                          className="accent-primary"
                         />
                         <span>{inst.name}</span>
-                        <span className="text-xs text-muted-foreground ml-auto font-mono">{inst.adminUrl}</span>
+                        <span className="text-[11px] text-muted-foreground ml-auto font-mono">{inst.adminUrl}</span>
                       </label>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">暂无可用实例</p>
+                  <p className="text-[13px] text-muted-foreground">暂无可用实例</p>
                 )}
               </div>
             )}
@@ -258,7 +251,7 @@ export function UsersPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>取消</Button>
             <Button onClick={handleSave} disabled={saving || !canSave}>
-              {saving ? '保存中...' : '保存'}
+              {saving ? '保存中…' : '保存'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -270,8 +263,8 @@ export function UsersPage() {
           <DialogHeader>
             <DialogTitle>确认删除用户</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-2">
-            <p className="text-sm text-muted-foreground">
+          <div className="space-y-3">
+            <p className="text-[14px] text-muted-foreground tracking-apple-caption">
               此操作不可撤销。请输入用户名 <span className="font-semibold text-foreground">{deleteTarget?.name}</span> 以确认删除。
             </p>
             <Input

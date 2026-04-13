@@ -2,75 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Apple-inspired design tokens
+ * - Binary palette: #f5f5f7 / #000 with #1d1d1f for text
+ * - Apple Blue (#0071e3) as the sole chromatic accent
+ * - Flat surfaces, no gradients, no glassmorphism (except nav)
+ */
+
 @layer base {
   :root {
-    --background: 220 20% 96%;
-    --foreground: 220 20% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
-    --border: 0 0% 100% / 0.18;
-    --input: 220 15% 92%;
-    --primary: 215 90% 56%;
+    /* Page surfaces */
+    --background: 0 0% 96.1%;         /* #f5f5f7 - light gray page */
+    --foreground: 240 4% 12%;         /* #1d1d1f - near black text */
+    --card: 0 0% 100%;                /* white cards on light gray */
+    --card-foreground: 240 4% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 4% 12%;
+
+    /* Primary = Apple Blue */
+    --primary: 211 100% 44.7%;        /* #0071e3 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 94%;
-    --secondary-foreground: 220 20% 20%;
-    --muted: 220 15% 92%;
-    --muted-foreground: 220 10% 46%;
-    --accent: 0 0% 100% / 0.5;
-    --accent-foreground: 220 20% 15%;
-    --destructive: 0 72% 56%;
+
+    /* Secondary = near-white surface */
+    --secondary: 240 20% 98%;         /* #fafafc - filter/search bg */
+    --secondary-foreground: 0 0% 20%; /* rgba(0,0,0,0.8) */
+
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 48%;     /* rgba(0,0,0,0.48) */
+
+    --accent: 0 0% 93%;               /* #ededf2 - button pressed */
+    --accent-foreground: 240 4% 12%;
+
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --ring: 215 90% 56%;
-    --radius: 1rem;
 
-    /* Liquid Glass tokens */
-    --glass-bg: rgba(255, 255, 255, 0.55);
-    --glass-bg-heavy: rgba(255, 255, 255, 0.72);
-    --glass-border: rgba(255, 255, 255, 0.45);
-    --glass-border-subtle: rgba(255, 255, 255, 0.22);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-    --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.10), 0 4px 16px rgba(0, 0, 0, 0.06);
-    --glass-blur: 20px;
-    --glass-highlight: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 60%);
+    /* Borders — almost invisible */
+    --border: 0 0% 0% / 0.08;
+    --input: 0 0% 0% / 0.08;
+    --ring: 211 100% 44.7%;            /* Apple Blue focus */
+    --radius: 0.5rem;                  /* 8px standard */
 
-    /* Neutral tint for glass surfaces */
-    --glass-tint: 255, 255, 255;
-    --glass-inset-bg: rgba(0, 0, 0, 0.03);
-    --glass-inset-border: rgba(0, 0, 0, 0.04);
-    --glass-inset-shadow: rgba(0, 0, 0, 0.06);
+    /* Apple-specific tokens */
+    --apple-blue: #0071e3;
+    --apple-link: #0066cc;
+    --apple-link-dark: #2997ff;
+    --apple-black: #000000;
+    --apple-near-black: #1d1d1f;
+    --apple-light-gray: #f5f5f7;
+    --apple-filter-bg: #fafafc;
+    --apple-button-pressed: #ededf2;
+
+    /* Apple's signature soft diffused shadow — 0.22 opacity per DESIGN.md */
+    --apple-shadow: 3px 5px 30px 0 rgba(0, 0, 0, 0.22);
   }
 
   .dark {
-      --background: 220 20% 8%;
-      --foreground: 220 15% 90%;
-      --card: 220 18% 12%;
-      --card-foreground: 220 15% 90%;
-      --border: 0 0% 100% / 0.08;
-      --input: 220 15% 16%;
-      --primary: 215 90% 60%;
-      --primary-foreground: 0 0% 100%;
-      --secondary: 220 15% 16%;
-      --secondary-foreground: 220 15% 85%;
-      --muted: 220 15% 18%;
-      --muted-foreground: 220 10% 55%;
-      --accent: 0 0% 100% / 0.08;
-      --accent-foreground: 220 15% 90%;
-      --destructive: 0 72% 56%;
-      --destructive-foreground: 0 0% 100%;
-      --ring: 215 90% 60%;
+    /* Dark mode: pure black page */
+    --background: 0 0% 0%;             /* #000 */
+    --foreground: 0 0% 100%;
+    --card: 240 3% 15%;                /* #272729 - dark card surface */
+    --card-foreground: 0 0% 100%;
+    --popover: 240 3% 16%;
+    --popover-foreground: 0 0% 100%;
 
-      --glass-bg: rgba(30, 35, 50, 0.6);
-      --glass-bg-heavy: rgba(25, 30, 45, 0.78);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --glass-border-subtle: rgba(255, 255, 255, 0.06);
-      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
-      --glass-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.25);
-      --glass-highlight: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
+    --primary: 211 100% 53%;           /* slightly brighter for dark */
+    --primary-foreground: 0 0% 100%;
 
-      --glass-tint: 30, 35, 50;
-      --glass-inset-bg: rgba(255, 255, 255, 0.03);
-      --glass-inset-border: rgba(255, 255, 255, 0.05);
-      --glass-inset-shadow: rgba(0, 0, 0, 0.2);
+    --secondary: 240 3% 17%;           /* #2a2a2d */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 3% 15%;
+    --muted-foreground: 0 0% 66%;
+
+    --accent: 240 3% 18%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 211 100% 53%;
   }
 }
 
@@ -78,96 +90,102 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply text-foreground antialiased;
+    @apply bg-background text-foreground antialiased;
     font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont,
       "PingFang SC", "Helvetica Neue", "Noto Sans SC", "Microsoft YaHei", sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.01em;
-    /* Vibrant mesh gradient background */
-    background:
-      radial-gradient(ellipse at 20% 0%, rgba(120, 180, 255, 0.25) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 10%, rgba(180, 140, 255, 0.2) 0%, transparent 50%),
-      radial-gradient(ellipse at 60% 90%, rgba(140, 220, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 10% 80%, rgba(200, 180, 255, 0.12) 0%, transparent 50%),
-      hsl(220, 20%, 96%);
-    background-attachment: fixed;
+    /* DESIGN.md §3: body baseline is 17px SF Pro Text, -0.022em tracking, line-height 1.47 */
+    font-size: 17px;
+    letter-spacing: -0.022em;
+    line-height: 1.47;
     min-height: 100vh;
   }
 
-  .dark body {
-      background:
-        radial-gradient(ellipse at 20% 0%, rgba(60, 100, 180, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 10%, rgba(100, 70, 180, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 60% 90%, rgba(60, 120, 180, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 10% 80%, rgba(100, 80, 180, 0.08) 0%, transparent 50%),
-        hsl(220, 20%, 8%);
-  }
+  /* Apple's tight headline line-heights: 1.07 / 1.10 / 1.14 — DESIGN.md §3 */
+  h1 { line-height: 1.07; letter-spacing: -0.005em; }
+  h2 { line-height: 1.10; letter-spacing: -0.003em; }
+  h3 { line-height: 1.14; letter-spacing: 0; }
 }
 
-/* Liquid glass utility */
+/*
+ * Navigation glass — the only place we keep a glass effect.
+ * This matches Apple's signature translucent dark nav bar.
+ */
 @layer utilities {
-  .glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+  .nav-glass {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
   }
-  .glass-heavy {
-    background: var(--glass-bg-heavy);
-    backdrop-filter: blur(24px) saturate(1.6);
-    -webkit-backdrop-filter: blur(24px) saturate(1.6);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+
+  .nav-glass-light {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
   }
-  .glass-subtle {
-    background: rgba(var(--glass-tint), 0.3);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border-subtle);
+
+  /* Apple's signature soft shadow — 0.22 opacity per DESIGN.md §2 */
+  .apple-shadow {
+    box-shadow: 3px 5px 30px 0 rgba(0, 0, 0, 0.22);
   }
-  .glass-highlight {
-    position: relative;
+
+  /* Apple pill radius — 980px for learn-more style links */
+  .rounded-pill {
+    border-radius: 980px;
   }
-  .glass-highlight::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--glass-highlight);
-    pointer-events: none;
-    z-index: 1;
+
+  /*
+   * Tracking utilities — exact values from DESIGN.md §3 typography hierarchy.
+   * Display sizes (21px+) use POSITIVE tracking; text sizes (17px-) use NEGATIVE.
+   */
+  .tracking-apple-hero {
+    letter-spacing: -0.005em;    /* -0.28px at 56px — Display Hero */
   }
-  .glass-inset {
-    background: var(--glass-inset-bg);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid var(--glass-inset-border);
-    box-shadow: inset 0 1px 3px var(--glass-inset-shadow);
+  .tracking-apple-section {
+    letter-spacing: -0.003em;    /* normal at 40px — Section Heading */
+  }
+  .tracking-apple-tile {
+    letter-spacing: 0.007em;     /* +0.196px at 28px — Tile Heading (positive) */
+  }
+  .tracking-apple-card-title {
+    letter-spacing: 0.011em;     /* +0.231px at 21px — Card Title (positive) */
+  }
+  .tracking-apple-body {
+    letter-spacing: -0.022em;    /* -0.374px at 17px — Body */
+  }
+  .tracking-apple-caption {
+    letter-spacing: -0.016em;    /* -0.224px at 14px — Caption */
+  }
+  .tracking-apple-micro {
+    letter-spacing: -0.01em;     /* -0.12px at 12px — Micro */
+  }
+  .tracking-apple-nano {
+    letter-spacing: -0.008em;    /* -0.08px at 10px — Nano */
   }
 }
 
-/* Smooth transitions globally */
-@layer base {
-  *, *::before, *::after {
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* Scrollbar styling */
+/* Thin scrollbar consistent with Apple web */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.25);
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(128, 128, 128, 0.4);
+  background: rgba(0, 0, 0, 0.3);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }

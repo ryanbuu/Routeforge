@@ -1,10 +1,18 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
+/*
+ * Apple-inspired table: flat, no container border, uses simple horizontal rules.
+ */
+
 const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto rounded-2xl glass">
-      <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
+    <div className="relative w-full overflow-auto">
+      <table
+        ref={ref}
+        className={cn('w-full caption-bottom text-[14px]', className)}
+        {...props}
+      />
     </div>
   )
 )
@@ -12,7 +20,11 @@ Table.displayName = 'Table'
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
   ({ className, ...props }, ref) => (
-    <thead ref={ref} className={cn('[&_tr]:border-b [&_tr]:border-white/20 dark:[&_tr]:border-white/8', className)} {...props} />
+    <thead
+      ref={ref}
+      className={cn('[&_tr]:border-b [&_tr]:border-foreground/10 dark:[&_tr]:border-white/10', className)}
+      {...props}
+    />
   )
 )
 TableHeader.displayName = 'TableHeader'
@@ -29,7 +41,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
     <tr
       ref={ref}
       className={cn(
-        'border-b border-white/10 dark:border-white/5 transition-colors hover:bg-white/20 dark:hover:bg-white/5 data-[state=selected]:bg-white/30 dark:data-[state=selected]:bg-white/10',
+        'border-b border-foreground/[0.06] dark:border-white/[0.06] transition-colors hover:bg-foreground/[0.02] dark:hover:bg-white/[0.03]',
         className
       )}
       {...props}
@@ -43,7 +55,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<
     <th
       ref={ref}
       className={cn(
-        'h-10 px-4 text-left align-middle font-medium text-muted-foreground/80 text-xs uppercase tracking-wider [&:has([role=checkbox])]:pr-0',
+        'h-11 px-4 text-left align-middle font-semibold text-[12px] text-muted-foreground tracking-apple-micro uppercase [&:has([role=checkbox])]:pr-0',
         className
       )}
       {...props}
@@ -54,7 +66,7 @@ TableHead.displayName = 'TableHead'
 
 const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
   ({ className, ...props }, ref) => (
-    <td ref={ref} className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...props} />
+    <td ref={ref} className={cn('px-4 py-3.5 align-middle tracking-apple-caption [&:has([role=checkbox])]:pr-0', className)} {...props} />
   )
 )
 TableCell.displayName = 'TableCell'

@@ -2,29 +2,47 @@ import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
+/*
+ * Apple-inspired button variants.
+ * - default: Apple Blue CTA
+ * - dark: #1d1d1f solid (secondary CTA)
+ * - outline: 1px border, transparent bg
+ * - ghost: no bg, darkens on hover
+ * - link: inline text link, Apple link blue
+ * - pill: 980px radius, transparent, 1px border — "Learn more" style
+ * - destructive: red CTA
+ */
+
 const buttonVariants = cva(
-  'inline-flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]',
+  'inline-flex items-center justify-center font-normal transition-colors duration-200 ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background ' +
+    'disabled:pointer-events-none disabled:opacity-40',
   {
     variants: {
       variant: {
         default:
-          'bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-sm hover:shadow-md hover:brightness-110',
+          'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/85 rounded-md',
+        dark:
+          'bg-[#1d1d1f] text-white hover:bg-black active:bg-[#333] rounded-md dark:bg-white dark:text-[#1d1d1f] dark:hover:bg-white/90',
         destructive:
-          'bg-gradient-to-b from-destructive to-destructive/90 text-destructive-foreground shadow-sm hover:shadow-md hover:brightness-110',
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md',
         outline:
-          'glass text-foreground hover:bg-white/60 dark:hover:bg-white/10',
+          'bg-transparent border border-foreground/20 text-foreground hover:bg-foreground/5 rounded-md',
         secondary:
-          'bg-white/50 dark:bg-white/10 backdrop-blur-sm text-secondary-foreground border border-white/30 dark:border-white/10 hover:bg-white/60 dark:hover:bg-white/15',
+          'bg-[#fafafc] dark:bg-[#2a2a2d] text-foreground hover:bg-[#ededf2] dark:hover:bg-[#333] rounded-lg border border-foreground/[0.06]',
         ghost:
-          'text-muted-foreground hover:text-foreground hover:bg-white/40 dark:hover:bg-white/10 rounded-lg',
+          'text-foreground/80 hover:text-foreground hover:bg-foreground/5 rounded-md',
         link:
-          'text-primary underline-offset-4 hover:underline',
+          'text-[#0066cc] dark:text-[#2997ff] hover:underline underline-offset-2 rounded-none p-0 h-auto',
+        pill:
+          'bg-transparent text-[#0066cc] dark:text-[#2997ff] border border-[#0066cc] dark:border-[#2997ff] hover:bg-[#0066cc]/5 dark:hover:bg-[#2997ff]/10 rounded-pill',
       },
       size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 rounded-lg px-3 text-xs',
-        lg: 'h-10 rounded-xl px-8',
-        icon: 'h-9 w-9 rounded-lg',
+        /* DESIGN.md §4: Standard button — 17px SF Pro Text weight 400, 8px 15px padding */
+        default: 'h-[34px] px-[15px] text-[17px] leading-none tracking-apple-body',
+        sm: 'h-8 px-3 text-[14px] leading-none tracking-apple-caption',
+        lg: 'h-11 px-6 text-[17px] leading-none tracking-apple-body',
+        icon: 'h-[34px] w-[34px]',
       },
     },
     defaultVariants: {

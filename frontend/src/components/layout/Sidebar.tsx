@@ -22,6 +22,13 @@ import { useInstance } from '@/contexts/InstanceContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { useState, useRef, useEffect } from 'react'
 
+/*
+ * Apple-inspired sidebar.
+ * Always uses the dark translucent glass treatment — in Apple's system,
+ * the navigation is always the dark blurred surface regardless of the
+ * content below. This preserves the signature "floating UI" feel.
+ */
+
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: '概览' },
   { to: '/routes', icon: Route, label: '路由' },
@@ -62,45 +69,46 @@ export function Sidebar() {
   }, [])
 
   return (
-    <aside className="w-60 glass-heavy flex flex-col border-r-0 rounded-r-3xl m-2 mr-0 overflow-hidden">
+    <aside className="w-60 shrink-0 flex flex-col nav-glass text-white">
       {/* Logo */}
-      <div className="h-14 flex items-center px-5">
-        <div className="flex items-center gap-2.5">
-          <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
-            <Route className="h-3.5 w-3.5 text-white" />
-          </div>
-          <span className="font-semibold text-[15px] tracking-tight text-foreground/90">Routeforge</span>
+      <div className="h-12 flex items-center px-5 border-b border-white/10">
+        <div className="flex items-center gap-2">
+          <Route className="h-4 w-4 text-white" />
+          <span className="text-[15px] font-semibold tracking-tight">Routeforge</span>
         </div>
       </div>
 
       {/* Instance Selector */}
       {instances.length > 0 && (
-        <div className="px-3 mb-1 relative" ref={pickerRef}>
+        <div className="px-3 pt-3 relative" ref={pickerRef}>
           <button
             onClick={() => setShowPicker(!showPicker)}
-            className="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-[12px] font-medium
-              glass-subtle hover:bg-white/40 dark:hover:bg-white/10 transition-colors duration-200"
+            className="w-full flex items-center justify-between gap-2 rounded-md px-3 py-2 text-[12px]
+              bg-white/[0.08] hover:bg-white/[0.12] transition-colors duration-150"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <div className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-              <span className="truncate text-foreground/80">{current?.name || '选择实例'}</span>
+              <div className="h-1.5 w-1.5 rounded-full bg-[#30d158] shrink-0" />
+              <span className="truncate text-white/90 font-medium">{current?.name || '选择实例'}</span>
             </div>
-            <ChevronDown className={cn("h-3.5 w-3.5 text-muted-foreground shrink-0 transition-transform duration-200", showPicker && "rotate-180")} />
+            <ChevronDown className={cn("h-3 w-3 text-white/60 shrink-0 transition-transform", showPicker && "rotate-180")} />
           </button>
           {showPicker && (
-            <div className="absolute left-3 right-3 top-full mt-1 glass-heavy rounded-xl shadow-lg z-50 py-1 max-h-48 overflow-auto">
+            <div className="absolute left-3 right-3 top-full mt-1 bg-[#1d1d1f] border border-white/10 rounded-md shadow-2xl z-50 py-1 max-h-48 overflow-auto">
               {instances.map(inst => (
                 <button
                   key={inst.id}
                   onClick={() => { setCurrent(inst); setShowPicker(false) }}
                   className={cn(
-                    "w-full text-left px-3 py-2 text-[12px] hover:bg-white/40 dark:hover:bg-white/10 transition-colors duration-150 flex items-center gap-2",
-                    inst.id === current?.id && "bg-white/30 dark:bg-white/10 font-medium"
+                    "w-full text-left px-3 py-2 text-[12px] hover:bg-white/[0.08] transition-colors flex items-center gap-2",
+                    inst.id === current?.id && "bg-white/[0.08]"
                   )}
                 >
-                  <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", inst.id === current?.id ? "bg-emerald-500" : "bg-muted-foreground/30")} />
-                  <span className="truncate">{inst.name}</span>
-                  {inst.default && <span className="text-[10px] text-muted-foreground ml-auto">默认</span>}
+                  <div className={cn(
+                    "h-1.5 w-1.5 rounded-full shrink-0",
+                    inst.id === current?.id ? "bg-[#30d158]" : "bg-white/30"
+                  )} />
+                  <span className="truncate text-white/90">{inst.name}</span>
+                  {inst.default && <span className="text-[10px] text-white/40 ml-auto">默认</span>}
                 </button>
               ))}
             </div>
@@ -109,7 +117,7 @@ export function Sidebar() {
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-2 space-y-0.5 overflow-auto">
+      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-auto">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -117,37 +125,38 @@ export function Sidebar() {
             end={to === '/'}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-200',
+                'flex items-center gap-3 rounded-md px-3 py-[7px] text-[13px] transition-colors duration-150',
                 isActive
-                  ? 'glass text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/30 dark:hover:bg-white/8'
+                  ? 'bg-white/[0.12] text-white font-medium'
+                  : 'text-white/70 hover:text-white hover:bg-white/[0.06]'
               )
             }
           >
-            <Icon className="h-[18px] w-[18px]" />
-            {label}
+            <Icon className="h-[15px] w-[15px]" strokeWidth={2} />
+            <span>{label}</span>
           </NavLink>
         ))}
         {isAdmin && (
           <>
-            <div className="pt-2 pb-1 px-3">
-              <div className="border-t border-white/20 dark:border-white/8" />
+            <div className="pt-3 pb-1 px-3">
+              <div className="border-t border-white/10" />
             </div>
+            <div className="px-3 pb-1 text-[10px] uppercase tracking-wider text-white/40">管理</div>
             {adminNavItems.map(({ to, icon: Icon, label }) => (
               <NavLink
                 key={to}
                 to={to}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-3 rounded-xl px-3 py-2 text-[13px] font-medium transition-all duration-200',
+                    'flex items-center gap-3 rounded-md px-3 py-[7px] text-[13px] transition-colors duration-150',
                     isActive
-                      ? 'glass text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-white/30 dark:hover:bg-white/8'
+                      ? 'bg-white/[0.12] text-white font-medium'
+                      : 'text-white/70 hover:text-white hover:bg-white/[0.06]'
                   )
                 }
               >
-                <Icon className="h-[18px] w-[18px]" />
-                {label}
+                <Icon className="h-[15px] w-[15px]" strokeWidth={2} />
+                <span>{label}</span>
               </NavLink>
             ))}
           </>
@@ -155,18 +164,18 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-3 space-y-2.5">
+      <div className="px-3 py-3 space-y-2.5 border-t border-white/10">
         {/* Theme switcher */}
-        <div className="flex items-center gap-1 px-1 py-1 rounded-xl glass-inset">
+        <div className="flex items-center gap-0.5 p-0.5 rounded-md bg-white/[0.06]">
           {themeOptions.map(opt => (
             <button
               key={opt.value}
               onClick={() => setTheme(opt.value)}
               className={cn(
-                'flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-[11px] font-medium transition-all duration-200',
+                'flex-1 flex items-center justify-center gap-1 py-1 rounded text-[10px] transition-colors duration-150',
                 theme === opt.value
-                  ? 'glass text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white/15 text-white'
+                  : 'text-white/50 hover:text-white/80'
               )}
               title={opt.label}
             >
@@ -175,17 +184,17 @@ export function Sidebar() {
             </button>
           ))}
         </div>
-        <div className="flex items-center justify-between px-2">
-          <span className="text-[12px] text-muted-foreground/80 truncate">{username}</span>
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[11px] text-white/60 truncate">{username}</span>
           <button
             onClick={logout}
-            className="text-muted-foreground/60 hover:text-destructive transition-colors duration-200"
+            className="text-white/50 hover:text-white transition-colors"
             title="退出登录"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-3.5 w-3.5" />
           </button>
         </div>
-        <div className="px-2 text-[11px] text-muted-foreground/50">
+        <div className="px-1 text-[10px] text-white/30 tracking-wider">
           Routeforge v0.1
         </div>
       </div>

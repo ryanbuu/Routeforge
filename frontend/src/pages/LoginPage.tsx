@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { Route } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -23,63 +25,55 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg mb-4">
-            <Route className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground/90">Routeforge</h1>
-          <p className="text-sm text-muted-foreground mt-1">APISIX Dashboard</p>
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="w-full max-w-[360px]">
+        {/* Hero brand */}
+        <div className="text-center mb-10">
+          <h1 className="text-[40px] font-semibold leading-[1.1] tracking-[-0.022em] text-foreground">
+            Routeforge
+          </h1>
+          <p className="text-[17px] text-muted-foreground mt-2 tracking-apple-body">
+            APISIX Dashboard
+          </p>
         </div>
 
-        {/* Login Card */}
-        <form onSubmit={handleSubmit} className="glass-heavy rounded-2xl p-6 space-y-4">
+        {/* Form — flat card */}
+        <form onSubmit={handleSubmit} className="bg-card rounded-xl p-7 space-y-5 shadow-apple">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground/80">用户名</label>
-            <input
+            <Label>用户名</Label>
+            <Input
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              className="flex h-10 w-full rounded-xl border bg-white/40 dark:bg-white/10 backdrop-blur-sm px-3 py-2 text-sm
-                ring-offset-background placeholder:text-muted-foreground
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-1
-                transition-shadow duration-200"
               placeholder="admin"
               autoFocus
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground/80">密码</label>
-            <input
+            <Label>密码</Label>
+            <Input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="flex h-10 w-full rounded-xl border bg-white/40 dark:bg-white/10 backdrop-blur-sm px-3 py-2 text-sm
-                ring-offset-background placeholder:text-muted-foreground
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-1
-                transition-shadow duration-200"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <div className="text-sm text-red-500 bg-red-50/50 dark:bg-red-950/30 rounded-lg px-3 py-2">
+            <div className="text-[13px] text-destructive bg-destructive/10 rounded-md px-3 py-2">
               {error}
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={loading || !username || !password}
-            className="w-full h-10 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium
-              shadow-sm hover:shadow-md transition-all duration-200
-              active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full"
+            size="lg"
           >
-            {loading ? '登录中...' : '登录'}
-          </button>
+            {loading ? '登录中…' : '登录'}
+          </Button>
         </form>
       </div>
     </div>

@@ -15,8 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { cn } from '@/lib/utils'
-import { Plus, Pencil, Trash2, Star, KeyRound, Server } from 'lucide-react'
+import { Plus, Pencil, Trash2, Star } from 'lucide-react'
 
 interface FormState {
   name: string
@@ -68,10 +67,7 @@ export function InstancesPage() {
         adminUrl: form.adminUrl,
         default: form.isDefault,
       }
-      // Only send apiKey if provided (create: required, edit: optional)
-      if (form.apiKey) {
-        payload.apiKey = form.apiKey
-      }
+      if (form.apiKey) payload.apiKey = form.apiKey
       if (editId) {
         await instancesApi.update(editId, payload as any)
       } else {
@@ -114,66 +110,62 @@ export function InstancesPage() {
         }
       />
 
-      <div className="p-6">
+      <div className="px-10 pb-10">
         {instances.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">暂无实例</div>
+          <div className="text-center py-16 text-muted-foreground text-[15px]">暂无实例</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {instances.map(inst => (
-              <Card key={inst.id} className="glass-heavy overflow-hidden">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        'h-10 w-10 rounded-xl flex items-center justify-center shadow-sm',
-                        inst.default
-                          ? 'bg-gradient-to-br from-amber-400 to-orange-500'
-                          : 'bg-gradient-to-br from-blue-500 to-indigo-600'
-                      )}>
-                        <Server className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-[15px] text-foreground">{inst.name}</div>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          {inst.default && <Badge variant="success" className="text-[10px]">默认</Badge>}
-                          {!inst.default && (
-                            <button
-                              onClick={() => handleSetDefault(inst.id)}
-                              className="text-muted-foreground/40 hover:text-amber-500 transition-colors"
-                              title="设为默认"
-                            >
-                              <Star className="h-3.5 w-3.5" />
-                            </button>
-                          )}
+              <Card key={inst.id}>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="text-[21px] font-bold leading-[1.19] tracking-apple-card-title text-foreground truncate">
+                          {inst.name}
                         </div>
+                        {inst.default ? (
+                          <Badge variant="success">默认</Badge>
+                        ) : (
+                          <button
+                            onClick={() => handleSetDefault(inst.id)}
+                            className="text-muted-foreground/40 hover:text-[#ff9500] transition-colors"
+                            title="设为默认"
+                          >
+                            <Star className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(inst)}>
-                        <Pencil className="h-3.5 w-3.5" />
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(inst)}>
+                        <Pencil className="h-4 w-4" />
                       </Button>
                       {!inst.default && (
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(inst.id)}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(inst.id)}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground w-16 shrink-0">Admin URL</span>
-                      <span className="font-mono text-xs text-foreground/70 truncate">{inst.adminUrl}</span>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="text-[11px] font-semibold uppercase tracking-apple-micro text-muted-foreground">
+                        Admin URL
+                      </div>
+                      <div className="font-mono text-[12px] text-foreground/70 mt-1 truncate">{inst.adminUrl}</div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground w-16 shrink-0">API Key</span>
-                      {inst.apiKeySet ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <KeyRound className="h-3 w-3" />
-                          <span className="font-mono">••••••••</span>
-                        </span>
-                      ) : (
-                        <Badge variant="destructive" className="text-[10px]">未设置</Badge>
-                      )}
+                    <div>
+                      <div className="text-[11px] font-semibold uppercase tracking-apple-micro text-muted-foreground">
+                        API Key
+                      </div>
+                      <div className="text-[12px] mt-1">
+                        {inst.apiKeySet ? (
+                          <span className="font-mono text-foreground/60">••••••••</span>
+                        ) : (
+                          <Badge variant="destructive">未设置</Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -189,7 +181,7 @@ export function InstancesPage() {
           <DialogHeader>
             <DialogTitle>{isCreating ? '添加实例' : '编辑实例'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-4">
             <div className="space-y-1.5">
               <Label>名称</Label>
               <Input
@@ -206,11 +198,11 @@ export function InstancesPage() {
                 placeholder="http://127.0.0.1:9180"
               />
             </div>
-<div className="space-y-1.5">
+            <div className="space-y-1.5">
               <Label>
                 API Key
                 {!isCreating && (
-                  <span className="ml-2 text-xs font-normal text-muted-foreground">留空则不修改</span>
+                  <span className="ml-2 text-[11px] font-normal text-muted-foreground">留空则不修改</span>
                 )}
               </Label>
               <Input
@@ -221,12 +213,12 @@ export function InstancesPage() {
                 autoComplete="off"
               />
             </div>
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-[13px]">
               <input
                 type="checkbox"
                 checked={form.isDefault}
                 onChange={e => setForm(f => ({ ...f, isDefault: e.target.checked }))}
-                className="rounded"
+                className="accent-primary"
               />
               设为默认实例
             </label>
@@ -234,7 +226,7 @@ export function InstancesPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>取消</Button>
             <Button onClick={handleSave} disabled={saving || !canSave}>
-              {saving ? '保存中...' : '保存'}
+              {saving ? '保存中…' : '保存'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -246,7 +238,7 @@ export function InstancesPage() {
           <DialogHeader>
             <DialogTitle>确认删除</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">确定要删除该实例吗？此操作不可撤销。</p>
+          <p className="text-[14px] text-muted-foreground tracking-apple-caption">确定要删除该实例吗？此操作不可撤销。</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>取消</Button>
             <Button variant="destructive" onClick={handleDelete}>删除</Button>

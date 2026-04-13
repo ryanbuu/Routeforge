@@ -1,34 +1,37 @@
 import { useQuery } from '@tanstack/react-query'
 import { routesApi, upstreamsApi, servicesApi, consumersApi, healthApi } from '@/api/resources'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Badge } from '@/components/ui/badge'
-import { Route, Server, Layers, Users, Activity } from 'lucide-react'
 import { parseApisixList } from '@/api/client'
 
+/*
+ * Apple-inspired dashboard.
+ * - Flat stat tiles on card surface
+ * - Huge, tightly-tracked number display
+ * - Monochrome icons (no gradients), description below
+ * - Connection status as a small text pill, not a loud badge
+ */
+
 const statItems = [
-  { key: 'routes', title: '路由', icon: Route, color: 'from-blue-500 to-blue-600' },
-  { key: 'upstreams', title: '上游', icon: Server, color: 'from-emerald-500 to-emerald-600' },
-  { key: 'services', title: '服务', icon: Layers, color: 'from-violet-500 to-violet-600' },
-  { key: 'consumers', title: '消费者', icon: Users, color: 'from-orange-500 to-orange-600' },
+  { key: 'routes', title: '路由', description: '已配置路由总数' },
+  { key: 'upstreams', title: '上游', description: '后端服务目标' },
+  { key: 'services', title: '服务', description: '共享配置组合' },
+  { key: 'consumers', title: '消费者', description: 'API 调用方' },
 ] as const
 
-function StatCard({ title, icon: Icon, value, color }: { title: string; icon: any; value: number | string; color: string }) {
+function StatCard({ title, description, value }: { title: string; description: string; value: number | string }) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <div className={`h-8 w-8 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-sm`}>
-          <Icon className="h-4 w-4 text-white" />
+    <Card className="p-7">
+      <CardContent className="p-0 space-y-3">
+        <div className="text-[13px] font-medium text-muted-foreground tracking-apple-caption">{title}</div>
+        <div className="text-[56px] font-semibold leading-[1.05] tracking-[-0.022em] text-foreground tabular-nums">
+          {value}
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold tracking-tight">{value}</div>
+        <div className="text-[13px] text-muted-foreground tracking-apple-caption">{description}</div>
       </CardContent>
     </Card>
   )
 }
-
 
 export function DashboardPage() {
   const { data: routes } = useQuery({ queryKey: ['routes'], queryFn: () => routesApi.list() })
@@ -51,16 +54,18 @@ export function DashboardPage() {
         title="概览"
         description="APISIX 资源统计与运行状态"
         action={
-          <Badge variant={isConnected ? 'success' : 'destructive'}>
-            <Activity className="h-3 w-3 mr-1" />
-            {isConnected ? 'APISIX 已连接' : 'APISIX 未连接'}
-          </Badge>
+          <div className="flex items-center gap-2 text-[13px] tracking-apple-caption">
+            <div className={`h-1.5 w-1.5 rounded-full ${isConnected ? 'bg-[#30d158]' : 'bg-destructive'}`} />
+            <span className="text-muted-foreground">
+              {isConnected ? 'APISIX 已连接' : 'APISIX 未连接'}
+            </span>
+          </div>
         }
       />
-      <div className="p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statItems.map(({ key, title, icon, color }) => (
-            <StatCard key={key} title={title} icon={icon} value={counts[key]} color={color} />
+      <div className="px-10 pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          {statItems.map(({ key, title, description }) => (
+            <StatCard key={key} title={title} description={description} value={counts[key]} />
           ))}
         </div>
       </div>

@@ -5,6 +5,7 @@ import { parseApisixList } from '@/api/client'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
@@ -26,16 +27,13 @@ interface ServiceFormState {
   id: string
   name: string
   desc: string
-  // upstream mode
   upstreamMode: 'id' | 'inline'
   upstream_id: string
-  // inline upstream fields
   upstreamType: string
   upstreamScheme: string
   upstreamNodes: UpstreamNode[]
   upstreamRetries: string
   upstreamTimeout: { connect: string; send: string; read: string }
-  // other
   hosts: string
   enable_websocket: boolean
   labels: string
@@ -47,7 +45,6 @@ function initForm(initial?: any): ServiceFormState {
   const up = v.upstream || {}
   const hasInline = v.upstream && (up.nodes || up.type)
 
-  // parse nodes from object or array format
   let nodes: UpstreamNode[] = [{ host: '', port: '80', weight: '1' }]
   if (up.nodes) {
     if (Array.isArray(up.nodes)) {
@@ -99,7 +96,6 @@ function buildPayload(form: ServiceFormState) {
     enable_websocket: form.enable_websocket,
   }
 
-  // upstream config
   if (form.upstreamMode === 'id') {
     if (form.upstream_id) payload.upstream_id = form.upstream_id
   } else {
@@ -134,13 +130,42 @@ function buildPayload(form: ServiceFormState) {
     if (Object.keys(labels).length > 0) payload.labels = labels
   }
   if (form.plugins.trim()) {
-    try { payload.plugins = JSON.parse(form.plugins) } catch { /* skip invalid */ }
+    try { payload.plugins = JSON.parse(form.plugins) } catch { /* skip */ }
   }
   return payload
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-widest pt-3">{children}</p>
+  return (
+    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-apple-micro pt-4">
+      {children}
+    </p>
+  )
+}
+
+function ToggleChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'px-3 py-1.5 rounded-md border text-[12px] font-medium transition-colors duration-150',
+        active
+          ? 'bg-primary text-primary-foreground border-primary'
+          : 'bg-transparent text-foreground/60 border-foreground/10 hover:bg-foreground/5'
+      )}
+    >
+      {children}
+    </button>
+  )
 }
 
 function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id: string, data: any) => void; onClose: () => void }) {
@@ -175,8 +200,7 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
   }
 
   return (
-    <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
-      {/* 基本信息 */}
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
       <SectionTitle>基本信息</SectionTitle>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
@@ -193,30 +217,26 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
         <Input value={form.desc} onChange={e => set('desc', e.target.value)} placeholder="服务描述（可选）" />
       </div>
 
-      {/* 上游配置 */}
       <SectionTitle>上游配置</SectionTitle>
-      <div className="space-y-1.5">
-        <Label>配置方式</Label>
-        <div className="flex gap-2">
-          {([
-            { label: '引用已有上游', value: 'id' as const },
-            { label: '内联配置', value: 'inline' as const },
-          ]).map(opt => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => set('upstreamMode', opt.value)}
-              className={cn(
-                'flex-1 py-1.5 rounded-xl border text-sm font-medium transition-all duration-200',
-                form.upstreamMode === opt.value
-                  ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                  : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+      <div className="flex gap-2">
+        {([
+          { label: '引用已有上游', value: 'id' as const },
+          { label: '内联配置', value: 'inline' as const },
+        ]).map(opt => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => set('upstreamMode', opt.value)}
+            className={cn(
+              'flex-1 h-10 rounded-md text-[14px] font-medium transition-colors duration-150 border',
+              form.upstreamMode === opt.value
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-transparent text-foreground/70 border-foreground/10 hover:bg-foreground/5'
+            )}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
 
       {form.upstreamMode === 'id' ? (
@@ -225,26 +245,15 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
           <Input value={form.upstream_id} onChange={e => set('upstream_id', e.target.value)} placeholder="填写上游 ID" />
         </div>
       ) : (
-        <div className="space-y-3 rounded-2xl p-3 glass-inset">
-          {/* 负载均衡 & 协议 */}
+        <div className="space-y-3 rounded-lg p-4 bg-[#fafafc] dark:bg-[#2a2a2d] border border-foreground/[0.06] dark:border-white/[0.08]">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>负载均衡</Label>
               <div className="flex flex-wrap gap-1.5">
                 {LB_TYPES.map(t => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => set('upstreamType', t)}
-                    className={cn(
-                      'px-2.5 py-1 rounded-lg border text-xs font-medium transition-all duration-200',
-                      form.upstreamType === t
-                        ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                        : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
-                    )}
-                  >
+                  <ToggleChip key={t} active={form.upstreamType === t} onClick={() => set('upstreamType', t)}>
                     {t}
-                  </button>
+                  </ToggleChip>
                 ))}
               </div>
             </div>
@@ -252,123 +261,83 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
               <Label>协议</Label>
               <div className="flex flex-wrap gap-1.5">
                 {UPSTREAM_SCHEMES.map(s => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => set('upstreamScheme', s)}
-                    className={cn(
-                      'px-2.5 py-1 rounded-lg border text-xs font-medium transition-all duration-200',
-                      form.upstreamScheme === s
-                        ? 'bg-primary/15 text-primary border-primary/25 shadow-sm'
-                        : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
-                    )}
-                  >
+                  <ToggleChip key={s} active={form.upstreamScheme === s} onClick={() => set('upstreamScheme', s)}>
                     {s}
-                  </button>
+                  </ToggleChip>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* 节点列表 */}
           <div className="space-y-1.5">
             <Label>目标节点</Label>
             <div className="space-y-2">
               {form.upstreamNodes.map((node, idx) => (
                 <div key={idx} className="flex gap-2 items-center">
-                  <Input
-                    value={node.host}
-                    onChange={e => setNode(idx, 'host', e.target.value)}
-                    placeholder="主机地址"
-                    className="flex-[3]"
-                  />
-                  <Input
-                    value={node.port}
-                    onChange={e => setNode(idx, 'port', e.target.value)}
-                    placeholder="端口"
-                    className="flex-1"
-                    type="number"
-                  />
-                  <Input
-                    value={node.weight}
-                    onChange={e => setNode(idx, 'weight', e.target.value)}
-                    placeholder="权重"
-                    className="flex-1"
-                    type="number"
-                  />
+                  <Input value={node.host} onChange={e => setNode(idx, 'host', e.target.value)} placeholder="主机地址" className="flex-[3]" />
+                  <Input value={node.port} onChange={e => setNode(idx, 'port', e.target.value)} placeholder="端口" className="flex-1" type="number" />
+                  <Input value={node.weight} onChange={e => setNode(idx, 'weight', e.target.value)} placeholder="权重" className="flex-1" type="number" />
                   {form.upstreamNodes.length > 1 && (
                     <Button variant="ghost" size="icon" className="shrink-0" onClick={() => removeNode(idx)}>
-                      <X className="h-4 w-4 text-muted-foreground" />
+                      <X className="h-4 w-4" />
                     </Button>
                   )}
                 </div>
               ))}
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="flex-[3]">主机</span>
-                <span className="flex-1">端口</span>
-                <span className="flex-1">权重</span>
-                {form.upstreamNodes.length > 1 && <span className="w-9" />}
-              </div>
             </div>
-            <Button variant="outline" size="sm" onClick={addNode} className="mt-1">
-              <Plus className="h-3 w-3 mr-1" />添加节点
+            <Button variant="secondary" size="sm" onClick={addNode} className="mt-1">
+              <Plus className="h-3.5 w-3.5 mr-1" />添加节点
             </Button>
           </div>
 
-          {/* 超时 & 重试 */}
           <div className="grid grid-cols-4 gap-2">
             <div className="space-y-1.5">
-              <Label className="text-xs">连接超时(s)</Label>
+              <Label>连接超时(s)</Label>
               <Input value={form.upstreamTimeout.connect} onChange={e => setTimeout('connect', e.target.value)} placeholder="60" type="number" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">发送超时(s)</Label>
+              <Label>发送超时(s)</Label>
               <Input value={form.upstreamTimeout.send} onChange={e => setTimeout('send', e.target.value)} placeholder="60" type="number" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">读取超时(s)</Label>
+              <Label>读取超时(s)</Label>
               <Input value={form.upstreamTimeout.read} onChange={e => setTimeout('read', e.target.value)} placeholder="60" type="number" />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">重试次数</Label>
+              <Label>重试次数</Label>
               <Input value={form.upstreamRetries} onChange={e => set('upstreamRetries', e.target.value)} placeholder="1" type="number" />
             </div>
           </div>
         </div>
       )}
 
-      {/* 其他配置 */}
       <SectionTitle>其他配置</SectionTitle>
       <div className="space-y-1.5">
-        <Label>
-          Hosts
-          <span className="ml-1 text-xs text-muted-foreground font-normal">多个 Host 逗号分隔</span>
-        </Label>
+        <Label>Hosts</Label>
         <Input value={form.hosts} onChange={e => set('hosts', e.target.value)} placeholder="example.com, *.example.com" />
+        <p className="text-[11px] text-muted-foreground tracking-apple-micro">多个 Host 逗号分隔</p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label>
-            标签
-            <span className="ml-1 text-xs text-muted-foreground font-normal">key=value, 逗号分隔</span>
-          </Label>
+          <Label>标签</Label>
           <Input value={form.labels} onChange={e => set('labels', e.target.value)} placeholder="env=prod, team=backend" />
+          <p className="text-[11px] text-muted-foreground tracking-apple-micro">key=value, 逗号分隔</p>
         </div>
         <div className="space-y-1.5">
           <Label>WebSocket</Label>
-          <div className="flex gap-2 pt-0.5">
+          <div className="flex gap-2">
             {[{ label: '启用', value: true }, { label: '禁用', value: false }].map(opt => (
               <button
                 key={String(opt.value)}
                 type="button"
                 onClick={() => set('enable_websocket', opt.value)}
                 className={cn(
-                  'flex-1 py-1.5 rounded-xl border text-sm font-medium transition-all duration-200',
+                  'flex-1 h-10 rounded-md text-[14px] font-medium transition-colors duration-150 border',
                   form.enable_websocket === opt.value
                     ? opt.value
-                      ? 'bg-emerald-500/20 text-emerald-700 border-emerald-500/30 shadow-sm'
-                      : 'bg-gray-500/15 text-gray-600 border-gray-500/20 shadow-sm'
-                    : 'bg-white/30 dark:bg-white/8 text-muted-foreground border-white/30 dark:border-white/10 hover:bg-white/50 dark:hover:bg-white/12'
+                      ? 'bg-[#30d158]/15 text-[#248a3d] dark:text-[#30d158] border-[#30d158]/30'
+                      : 'bg-foreground/10 text-foreground/70 border-foreground/15'
+                    : 'bg-transparent text-foreground/60 border-foreground/10 hover:bg-foreground/5'
                 )}
               >
                 {opt.label}
@@ -378,20 +347,17 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label>
-          插件配置
-          <span className="ml-1 text-xs text-muted-foreground font-normal">JSON 格式（可选）</span>
-        </Label>
+        <Label>插件配置</Label>
         <Textarea
           value={form.plugins}
           onChange={e => { set('plugins', e.target.value); setPluginError('') }}
-          className="font-mono text-xs min-h-[100px] resize-none"
+          className="font-mono text-[12px] min-h-[100px] resize-none"
           placeholder='{ "limit-count": { "count": 100, "time_window": 60 } }'
         />
-        {pluginError && <p className="text-xs text-destructive">{pluginError}</p>}
+        {pluginError && <p className="text-[11px] text-destructive">{pluginError}</p>}
       </div>
 
-      <div className="flex justify-end gap-2 pt-2 border-t">
+      <div className="flex justify-end gap-2 pt-2">
         <Button variant="outline" onClick={onClose}>取消</Button>
         <Button onClick={handleSave}>保存</Button>
       </div>
@@ -399,7 +365,6 @@ function ServiceForm({ initial, onSave, onClose }: { initial?: any; onSave: (id:
   )
 }
 
-/** 从 service 对象中提取上游摘要信息 */
 function getUpstreamSummary(value: any): { label: string; nodes: string } {
   if (value?.upstream_id) {
     return { label: `引用: ${value.upstream_id}`, nodes: '' }
@@ -476,76 +441,80 @@ export function ServicesPage() {
         title="服务管理"
         description="管理 APISIX 服务抽象层"
         action={
-          <Button size="sm" onClick={() => { setEditing(null); setOpen(true) }}>
+          <Button onClick={() => { setEditing(null); setOpen(true) }}>
             <Plus className="h-4 w-4 mr-1" />新建服务
           </Button>
         }
       />
-      <div className="p-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">#</TableHead>
-              <TableHead>名称</TableHead>
-              <TableHead>上游类型</TableHead>
-              <TableHead>目标节点</TableHead>
-              <TableHead>Hosts</TableHead>
-              <TableHead className="text-right">操作</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">加载中...</TableCell>
-              </TableRow>
-            )}
-            {items.map((item, idx) => {
-              const id = item.key?.split('/').pop() || item.value?.id
-              const upSummary = getUpstreamSummary(item.value)
-              return (
-                <TableRow key={id}>
-                  <TableCell className="text-muted-foreground text-xs">{page * 10 + idx + 1}</TableCell>
-                  <TableCell>
-                    {item.value?.name
-                      ? <span className="inline-block bg-white/50 dark:bg-white/10 border border-white/30 dark:border-white/10 rounded-md px-2 py-0.5 text-sm font-semibold text-foreground/80">{item.value.name}</span>
-                      : <span className="text-muted-foreground">-</span>}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">{upSummary.label}</Badge>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs max-w-[200px] truncate">
-                    {upSummary.nodes || '-'}
-                  </TableCell>
-                  <TableCell className="text-xs">
-                    {item.value?.hosts?.length
-                      ? <div className="flex gap-1 flex-wrap">
-                          {item.value.hosts.map(h => (
-                            <Badge key={h} variant="outline" className="text-xs">{h}</Badge>
-                          ))}
-                        </div>
-                      : '-'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => { setEditing(item); setOpen(true) }}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => { setDeleteTarget({ id, name: item.value?.name || id }); setDeleteConfirmName('') }}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
+      <div className="px-10 pb-10">
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12 pl-6">#</TableHead>
+                  <TableHead>名称</TableHead>
+                  <TableHead>上游类型</TableHead>
+                  <TableHead>目标节点</TableHead>
+                  <TableHead>Hosts</TableHead>
+                  <TableHead className="text-right pr-6">操作</TableHead>
                 </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-10">加载中…</TableCell>
+                  </TableRow>
+                )}
+                {items.map((item, idx) => {
+                  const id = item.key?.split('/').pop() || item.value?.id
+                  const upSummary = getUpstreamSummary(item.value)
+                  return (
+                    <TableRow key={id}>
+                      <TableCell className="text-muted-foreground pl-6">{page * 10 + idx + 1}</TableCell>
+                      <TableCell>
+                        {item.value?.name
+                          ? <span className="font-medium text-foreground">{item.value.name}</span>
+                          : <span className="text-muted-foreground">-</span>}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{upSummary.label}</Badge>
+                      </TableCell>
+                      <TableCell className="font-mono text-[12px] text-foreground/70 max-w-[220px] truncate">
+                        {upSummary.nodes || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {item.value?.hosts?.length
+                          ? <div className="flex gap-1 flex-wrap">
+                              {item.value.hosts.map(h => (
+                                <Badge key={h} variant="outline">{h}</Badge>
+                              ))}
+                            </div>
+                          : <span className="text-muted-foreground">-</span>}
+                      </TableCell>
+                      <TableCell className="text-right pr-6">
+                        <Button variant="ghost" size="icon" onClick={() => { setEditing(item); setOpen(true) }}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => { setDeleteTarget({ id, name: item.value?.name || id }); setDeleteConfirmName('') }}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
-            <span className="text-sm text-muted-foreground">共 {total} 条</span>
+            <span className="text-[13px] text-muted-foreground tracking-apple-caption">共 {total} 条</span>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" disabled={page === 0} onClick={() => setPage(p => p - 1)}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm text-muted-foreground">{page + 1} / {totalPages}</span>
+              <span className="text-[13px] text-muted-foreground">{page + 1} / {totalPages}</span>
               <Button variant="outline" size="icon" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -563,14 +532,13 @@ export function ServicesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 删除确认 */}
       <Dialog open={deleteTarget !== null} onOpenChange={() => setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>确认删除服务</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-2">
-            <p className="text-sm text-muted-foreground">
+          <div className="space-y-3">
+            <p className="text-[14px] text-muted-foreground tracking-apple-caption">
               此操作不可撤销。请输入服务名称 <span className="font-semibold text-foreground">{deleteTarget?.name}</span> 以确认删除。
             </p>
             <Input

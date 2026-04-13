@@ -11,9 +11,8 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
-import { Plus, Pencil, Trash2, KeyRound, User } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 
-/* ─── Known auth plugins with visual fields ─── */
 const AUTH_PLUGINS = [
   { key: 'key-auth', label: 'Key Auth', fields: [{ name: 'key', label: 'API Key', placeholder: 'my-api-key' }] },
   { key: 'basic-auth', label: 'Basic Auth', fields: [{ name: 'username', label: '用户名', placeholder: 'user' }, { name: 'password', label: '密码', placeholder: '••••', type: 'password' }] },
@@ -52,7 +51,6 @@ function buildPluginsPayload(pluginState: Record<string, PluginState>, extraJson
       plugins[p.key] = config
     }
   }
-  // merge extra JSON plugins
   if (extraJson.trim()) {
     try {
       const extra = JSON.parse(extraJson)
@@ -60,10 +58,6 @@ function buildPluginsPayload(pluginState: Record<string, PluginState>, extraJson
     } catch { /* skip */ }
   }
   return plugins
-}
-
-function getKnownPluginKeys(plugins: Record<string, any> = {}): string[] {
-  return AUTH_PLUGINS.map(p => p.key).filter(k => k in plugins)
 }
 
 function getExtraPlugins(plugins: Record<string, any> = {}): Record<string, any> {
@@ -75,7 +69,13 @@ function getExtraPlugins(plugins: Record<string, any> = {}): Record<string, any>
   return extra
 }
 
-/* ─── Consumer Form ─── */
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-apple-micro pt-4">
+      {children}
+    </p>
+  )
+}
 
 function ConsumerForm({ initial, onSave, onClose }: {
   initial?: any
@@ -124,7 +124,8 @@ function ConsumerForm({ initial, onSave, onClose }: {
   }
 
   return (
-    <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+      <SectionTitle>基本信息</SectionTitle>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
           <Label>用户名</Label>
@@ -136,33 +137,34 @@ function ConsumerForm({ initial, onSave, onClose }: {
         </div>
       </div>
 
-      <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-widest pt-2">认证插件</p>
+      <SectionTitle>认证插件</SectionTitle>
       <div className="space-y-2">
         {AUTH_PLUGINS.map(p => {
           const s = pluginState[p.key]
           return (
-            <div key={p.key} className={cn(
-              'rounded-2xl border p-3 transition-all duration-200',
-              s.enabled
-                ? 'glass border-primary/20'
-                : 'border-white/20 dark:border-white/8 bg-white/20 dark:bg-white/5'
-            )}>
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-                  <input
-                    type="checkbox"
-                    checked={s.enabled}
-                    onChange={() => togglePlugin(p.key)}
-                    className="rounded"
-                  />
-                  {p.label}
-                </label>
-              </div>
+            <div
+              key={p.key}
+              className={cn(
+                'rounded-lg border p-4 transition-colors duration-150',
+                s.enabled
+                  ? 'border-primary/40 bg-primary/[0.04]'
+                  : 'border-foreground/[0.06] dark:border-white/[0.08] bg-[#fafafc] dark:bg-[#2a2a2d]'
+              )}
+            >
+              <label className="flex items-center gap-2.5 cursor-pointer text-[14px] font-medium text-foreground">
+                <input
+                  type="checkbox"
+                  checked={s.enabled}
+                  onChange={() => togglePlugin(p.key)}
+                  className="accent-primary"
+                />
+                {p.label}
+              </label>
               {s.enabled && (
-                <div className="grid grid-cols-2 gap-2 mt-2.5">
+                <div className="grid grid-cols-2 gap-3 mt-3">
                   {p.fields.map(f => (
-                    <div key={f.name} className="space-y-1">
-                      <Label className="text-xs">{f.label}</Label>
+                    <div key={f.name} className="space-y-1.5">
+                      <Label>{f.label}</Label>
                       <Input
                         type={'type' in f ? f.type : 'text'}
                         value={s.fields[f.name] || ''}
@@ -178,24 +180,24 @@ function ConsumerForm({ initial, onSave, onClose }: {
         })}
       </div>
 
-      <p className="text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-widest pt-2">其他插件</p>
-      <Textarea
-        value={extraJson}
-        onChange={e => { setExtraJson(e.target.value); setJsonError('') }}
-        className="font-mono text-xs min-h-[80px] resize-none"
-        placeholder='{ "limit-count": { "count": 100, "time_window": 60 } }'
-      />
-      {jsonError && <p className="text-xs text-destructive">{jsonError}</p>}
+      <SectionTitle>其他插件</SectionTitle>
+      <div className="space-y-1.5">
+        <Textarea
+          value={extraJson}
+          onChange={e => { setExtraJson(e.target.value); setJsonError('') }}
+          className="font-mono text-[12px] min-h-[80px] resize-none"
+          placeholder='{ "limit-count": { "count": 100, "time_window": 60 } }'
+        />
+        {jsonError && <p className="text-[11px] text-destructive">{jsonError}</p>}
+      </div>
 
-      <div className="flex justify-end gap-2 pt-2 border-t">
+      <div className="flex justify-end gap-2 pt-2">
         <Button variant="outline" onClick={onClose}>取消</Button>
         <Button onClick={handleSave} disabled={!username}>保存</Button>
       </div>
     </div>
   )
 }
-
-/* ─── Main Page ─── */
 
 export function ConsumersPage() {
   const qc = useQueryClient()
@@ -222,55 +224,57 @@ export function ConsumersPage() {
       <PageHeader
         title="消费者管理"
         description="管理 API 消费者与认证"
-        action={<Button size="sm" onClick={() => { setEditing(null); setOpen(true) }}><Plus className="h-4 w-4 mr-1" />新建消费者</Button>}
+        action={
+          <Button onClick={() => { setEditing(null); setOpen(true) }}>
+            <Plus className="h-4 w-4 mr-1" />新建消费者
+          </Button>
+        }
       />
-      <div className="p-6">
+      <div className="px-10 pb-10">
         {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">加载中...</div>
+          <div className="text-center py-16 text-muted-foreground text-[15px]">加载中…</div>
         ) : items.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">暂无消费者</div>
+          <div className="text-center py-16 text-muted-foreground text-[15px]">暂无消费者</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {items.map((item: any) => {
               const username = item.value?.username || item.key?.split('/').pop()
               const plugins = item.value?.plugins || {}
               const pluginNames = Object.keys(plugins)
               return (
-                <Card key={username} className="glass-heavy overflow-hidden">
-                  <CardContent className="p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-400 to-rose-500 flex items-center justify-center shadow-sm">
-                          <User className="h-5 w-5 text-white" />
+                <Card key={username}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[21px] font-bold leading-[1.19] tracking-apple-card-title text-foreground truncate">
+                          {username}
                         </div>
-                        <div>
-                          <div className="font-semibold text-[15px] text-foreground">{username}</div>
-                          {item.value?.desc && (
-                            <div className="text-xs text-muted-foreground mt-0.5">{item.value.desc}</div>
-                          )}
-                        </div>
+                        {item.value?.desc && (
+                          <div className="text-[13px] text-muted-foreground mt-1 tracking-apple-caption truncate">
+                            {item.value.desc}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => { setEditing(item); setOpen(true) }}>
-                          <Pencil className="h-3.5 w-3.5" />
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        <Button variant="ghost" size="icon" onClick={() => { setEditing(item); setOpen(true) }}>
+                          <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => { setDeleteTarget({ username }); setDeleteConfirmName('') }}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        <Button variant="ghost" size="icon" onClick={() => { setDeleteTarget({ username }); setDeleteConfirmName('') }}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    <div className="text-xs text-muted-foreground mb-1.5">认证插件</div>
+                    <div className="text-[11px] font-semibold uppercase tracking-apple-micro text-muted-foreground mb-2">
+                      认证插件
+                    </div>
                     {pluginNames.length > 0 ? (
                       <div className="flex gap-1.5 flex-wrap">
                         {pluginNames.map(name => (
-                          <Badge key={name} variant="secondary" className="text-xs">
-                            <KeyRound className="h-2.5 w-2.5 mr-1" />
-                            {name}
-                          </Badge>
+                          <Badge key={name} variant="outline">{name}</Badge>
                         ))}
                       </div>
                     ) : (
-                      <span className="text-sm text-muted-foreground/50">无</span>
+                      <span className="text-[14px] text-muted-foreground/60 tracking-apple-caption">无</span>
                     )}
                   </CardContent>
                 </Card>
@@ -287,14 +291,13 @@ export function ConsumersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
       <Dialog open={deleteTarget !== null} onOpenChange={() => setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>确认删除消费者</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-2">
-            <p className="text-sm text-muted-foreground">
+          <div className="space-y-3">
+            <p className="text-[14px] text-muted-foreground tracking-apple-caption">
               此操作不可撤销。请输入消费者名称 <span className="font-semibold text-foreground">{deleteTarget?.username}</span> 以确认删除。
             </p>
             <Input
